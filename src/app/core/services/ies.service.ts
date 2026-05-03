@@ -11,6 +11,7 @@ import { environment } from '../../../environments/environment';
 export class IesService {
   private readonly API = `${environment.apiUrl}/ies`;
   private cacheIes: Ies[] | null = null;
+
   
   constructor(private http: HttpClient){}
 
@@ -43,6 +44,11 @@ export class IesService {
   inativar(id: number): Observable<any> {
     this.limparCache();
     return this.http.patch(this.API + '/' + id + '/inativar', {});  
+  }
+
+  reativar(id:number): Observable<void> {
+    this.limparCache();
+    return this.http.patch<void>(`${this.API}/${id}/reativar`, {});
   }
 
   limparCache() {

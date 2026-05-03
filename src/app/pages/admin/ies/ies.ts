@@ -111,4 +111,18 @@ export class IesC implements OnInit {
     this.modalInativarAberto = false;
     this.iesSelecionada = null;
   } 
+
+  toggleStatus(ies: Ies) {
+    if(ies.status) {
+      this.abrirModalInativarIES(ies);
+    } else {
+      this.iesService.reativar(ies.id!).subscribe({
+        next: () => {
+          this.toastService.exibir(`${ies.nome} reativada com sucesso!`, 'sucesso');
+          this.carregarIes();
+        },
+        error: () => this.toastService.exibir('Erro ao reativar IES', 'erro')
+      });
+    }
+  }
 }
