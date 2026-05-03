@@ -38,6 +38,11 @@ export class EscolaService {
     return this.http.patch(`${this.API}/${id}/inativar`, {});
   }
 
+  reativar (id: number): Observable<void> {
+    this.limparCache();
+    return this.http.patch<void>(`${this.API}/${id}/reativar`, {});
+  }
+
   private limparCache() {
     this.cacheEscolas = null;
   }

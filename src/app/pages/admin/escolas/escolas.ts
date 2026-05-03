@@ -1,4 +1,4 @@
-import { Component, inject, OnInit} from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
@@ -19,6 +19,7 @@ export class Escolas implements OnInit {
   escolaService = inject(EscolaService);
   iesService = inject(IesService);
   profService = inject(ProfessorService);
+  cdr = inject(ChangeDetectorRef)
 
   tBusca: string = '';
   listEscolas: Escola[] = [];
@@ -41,7 +42,10 @@ export class Escolas implements OnInit {
 
   carregarDados() {
     this.escolaService.listarTodas().subscribe({
-      next: (dados) => this.listEscolas = dados,
+      next: (dados) => {
+        this.listEscolas = dados;
+        this.cdr.detectChanges();
+      },
       error: () => this.toastService.exibir('Erro ao buscar escolas', 'aviso')
     });
     this.iesService.listarTodas().subscribe(dados => this.listaIes = dados);
@@ -131,6 +135,20 @@ export class Escolas implements OnInit {
     this.modoEdicao = true;
     this.novaEscola = {...escola};
     this.modalNovaEscolaAberto = true;
+  }
+
+  toggleStatus (escola: Escola) {
+    if (escola.status) {
+      this.abrirModalInativarEscola(escola);
+    } else {
+      this.escolaService.reativar(escola.id!).subscribe({
+        next: () => {
+          this.toastService.exibir(`${escola.nome} reativada com sucesso!`, 'sucesso');
+          this.carregarDados();
+        },
+        error: () => this.toastService.exibir('Erro ao reativar escola', 'erro')
+      });
+    }
   }
 
 
