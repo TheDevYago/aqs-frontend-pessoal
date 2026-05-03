@@ -55,7 +55,7 @@ export class Matrizes implements OnInit {
       return this.listaMatrizes;
     }
     const termo = this.tBusca.toLowerCase();
-    return this.listaMatrizes.filter(matriz => matriz.nome.toLowerCase().includes(termo) || (matriz.curso && matriz.curso.nome.toLowerCase().includes(termo)));
+    return this.listaMatrizes.filter(matriz => matriz.nome.toLowerCase().includes(termo) || (matriz.curso && matriz.curso.descricao.toLowerCase().includes(termo)));
   }
 
   salvarNovaMatriz() {

@@ -3,10 +3,11 @@ import { Escola } from "./escola.model";
 export interface Curso {
     id?: number;
     sigla: string;
-    nome: string;
-    escola: Escola;
+    descricao: string;
+    escolaId?: number; 
+    nomeEscola?: string;
     turno: string;
-    coordenador: string;
-    status: boolean | 'Ativo' | 'Inativo'; // Pode ser um booleano ou uma string para facilitar a exibição
+    coordenadorCurso: string;
+    status: boolean;
     dataCadastro?: string;
 }

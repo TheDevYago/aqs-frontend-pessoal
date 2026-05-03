@@ -36,22 +36,30 @@
                     @for(curso of cursosFiltrados; track curso.sigla + curso.status){
                         <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
                             <td class="py-6 font-bold text-dashboard-secondary">{{curso.sigla}}</td>
-                            <td class="py-6 text-dashboard-secondary">{{curso.nome}}</td>
-                            <td class="py-6 text-dashboard-muted">{{curso.escola}}</td>
+                            <td class="py-6 text-dashboard-secondary">{{curso.descricao}}</td>
+                            <td class="py-6 text-dashboard-muted">{{curso.nomeEscola}}</td>
                             <td class="py-6 text-dashboard-muted">{{curso.turno}}</td>
-                            <td class="py-6 text-dashboard-muted">{{curso.coordenador}}</td>
-                            <td class="py-6 text-dashboard-muted">{{curso.dataCadastro}}</td>
+                            <td class="py-6 text-dashboard-muted">{{curso.coordenadorCurso}}</td>
+                            <td class="py-6 text-dashboard-muted">{{curso.dataCadastro | date:'dd/MM/yyyy HH:mm'}}</td>
                             <td class="py-6">
-                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full" [ngClass]="curso.status === 'Ativo' ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-secondary'">
-                                {{curso.status}}
+                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full" [ngClass]="curso.status ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-secondary'">
+                                {{curso.status ? 'Ativo' : 'Inativo'}}
                                 </span>
                             </td>
                             <td class="py-6 flex justify-center gap-3">
                                 <button (click)="abrirModalEditar(curso)" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-2" title="Editar">
                                     <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </button>
-                                <button (click)="abrirModalInativarCurso(curso)" class="text-dashboard-muted hover:text-amber-500 transition-colors p-2" title="Inativar">
-                                    <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
+                                <button (click)="toggleStatus(curso)" [ngClass]="curso.status ? 'hover:text-amber-500' : 'hover:text-emerald-500'" class="text-dashboard-muted transition-colors p-2" [title]="curso.status ? 'Inativar' : 'Reativar'">
+                                    @if (curso.status) {
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/>
+                                        </svg>
+                                    } @else {
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    }
                                 </button>
                             </td>
                         </tr>
@@ -112,14 +120,15 @@
                     </div>
                     <div class="flex flex-col gap-2 col-span-2">
                         <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Nome</label>
-                        <input type="text" [(ngModel)]="novoCurso.nome" placeholder="ex: engenharia de software" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                        <input type="text" [(ngModel)]="novoCurso.descricao" placeholder="ex: engenharia de software" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
                     </div>
                     <div class="flex flex-col gap-2 col-span-3">
                         <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Escola</label>
-                        <select [(ngModel)]="novoCurso.escola" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
-                            <option value="null" disabled selected>Selecione uma Escola</option>
-                            <option value="Escola de Engenharia">Escola de Engenharia</option>
-                            <option value="Escola de Négocios">Escola de Negócios</option>
+                        <select [(ngModel)]="novoCurso.escolaId" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option [ngValue]="undefined" disabled selected>Selecione uma Escola</option>
+                            @for (escola of listaEscola; track escola.id) {
+                                <option [ngValue]="escola.id">{{ escola.nome }}</option>
+                            }
                         </select>
                     </div>
                     <div class="flex flex-col gap-2 col-span-1">
@@ -133,7 +142,12 @@
                     </div>
                     <div class="flex flex-col gap-2 col-span-2">
                         <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Coordenador</label>
-                        <input type="text" [(ngModel)]="novoCurso.coordenador" placeholder="nome do coordenador" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                        <select [(ngModel)]="novoCurso.coordenadorCurso" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option [ngValue]="null" disabled selected>Selecione um Coordenador</option>
+                            @for (prof of listaProfessores; track prof.matricula) {
+                                <option [ngValue]="prof.nome">{{ prof.nome }}</option>
+                            }
+                        </select>
                     </div>
                     <div class="flex flex-col gap-2 col-span-3">
                         <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Status</label>
@@ -161,7 +175,7 @@
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
             </div>
             <h3 class="font-poppins font-bold text-[24px] text-[#0f172a] mb-3">Confirmar Inativação</h3>
-            <p class="font-dm-sans text-[15px] text-[#64748b] mb-8 leading-relaxed"> Você está prestes a inativar o curso de <strong class="text-[#0f172a] uppercase">{{cursoSelecionado?.nome}}</strong>. Esta ação pode ser revertida posteriormente.
+            <p class="font-dm-sans text-[15px] text-[#64748b] mb-8 leading-relaxed"> Você está prestes a inativar o curso de <strong class="text-[#0f172a] uppercase">{{cursoSelecionado?.descricao}}</strong>. Esta ação pode ser revertida posteriormente.
             </p>
 
             <div class="flex items-center justify-center gap-4">
