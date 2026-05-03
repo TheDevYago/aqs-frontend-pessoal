@@ -1,0 +1,89 @@
+<div class="flex flex-col gap-6 w-full max-w-387.5 mx-auto">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Histórico de Monitorias</h2>
+            <p class="font-poppins text-[16px] text-slate-300 leading-6">Visualize o Histórico Completo de Alunos Monitores Orientados</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] flex justify-between items-start">
+            <div class="flex flex-col gap-1">
+                <p class="font-inter font-medium text-[15px] text-dashboard-muted">Total de Monitores</p>
+                <h3 class="font-poppins font-bold text-[40px] text-dashboard-secondary leading-none mt-2">{{resumo.totalMonitorias}}</h3>
+                <p class="font-inter text-[13px] text-dashboard-muted mt-2">Orientados ate o Momento</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-[#e0e7ff] flex items-center justify-center text-[#4f46e5]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] flex justify-between items-start">
+            <div class="flex flex-col gap-1">
+                <p class="font-inter font-medium text-[15px] text-dashboard-muted">Alunos Atendidos</p>
+                <h3 class="font-poppins font-bold text-[40px] text-dashboard-secondary leading-none mt-2">{{resumo.alunosAtendidos}}</h3>
+                <p class="font-inter text-[13px] text-dashboard-muted mt-2">Total de Alunos Beneficiados</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-[#dcfce3] flex items-center justify-center text-[#166534]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] flex justify-between items-start">
+            <div class="flex flex-col gap-1">
+                <p class="font-inter font-medium text-[15px] text-dashboard-muted">Disciplinas</p>
+                <h3 class="font-poppins font-bold text-[40px] text-dashboard-secondary leading-none mt-2">{{resumo.disciplinas}}</h3>
+                <p class="font-inter text-[13px] text-dashboard-muted mt-2">Com Monitoria Ativa</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-[#f3e8ff] flex items-center justify-center text-[#9333ea]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full min-h-125">
+        <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-6">Historico Completo</h3>
+
+        <div class="bg-slate-50 rounded-xl p-3 flex items-center gap-3 w-full mb-6">
+            <svg class="w-5 h-5 text-dashboard-muted/70 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" [(ngModel)]="tBusca" (ngModelChange)="filtrarHistorico()" placeholder="Buscar Por Monitores ou Disciplinas...." class="w-full bg-transparent border-none outline-none font-inter text-[14px] text-dashboard-secondary placeholder:text-dashboard-muted/70">
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-250">
+                <thead>
+                    <tr class="border-b border-dashboard-surface font-inter text-[14px] text-dashboard-muted">
+                        <th class="pb-4 font-normal">Matricula</th>
+                        <th class="pb-4 font-normal">Monitor</th>
+                        <th class="pb-4 font-normal">Disciplina</th>
+                        <th class="pb-4 font-normal">Semestre</th>
+                        <th class="pb-4 font-normal text-center">Tipo</th>
+                        <th class="pb-4 font-normal">Periodo</th>
+                        <th class="pb-4 font-normal text-center">Alunos</th>
+                        <th class="pb-4 font-normal text-center">Parecer</th>
+                    </tr>
+                </thead>
+                <tbody class="font-inter text-[14px]">
+                    @for (item of historicoFiltrado; track item.matricula) {
+                        <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
+                            <td class="py-5 font-bold text-dashboard-secondary">{{item.matricula}}</td>
+                            <td class="py-5 font-bold text-dashboard-secondary">{{item.monitor}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.disciplina}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.semestre}}</td>
+                            <td class="py-5 text-center">
+                                <span class="text-[11px] font-medium px-4 py-1.5 rounded-full bg-dashboard-secondary text-white">
+                                    {{item.tipo}}
+                                </span>
+                            </td>
+                            <td class="py-5 text-dashboard-muted"> {{item.periodo}}</td>
+                            <td class="py-5 text-dashboard-accent text-center font-bold">{{item.alunos}}</td>
+                            <td class="py-5 text-center">
+                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full" [ngClass]="item.parecer === 'Aprovado' ? 'bg-[#dcfce3] text-[#166534]' : 'bg-[#fef3c7] text-[#d97706]'">
+                                    {{item.parecer}}
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

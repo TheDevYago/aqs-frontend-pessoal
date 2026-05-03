@@ -1,0 +1,219 @@
+<div class="flex flex-col gap-6 w-full max-w-387.5 mx-auto">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Lançamento de Resultados</h2>
+            <p class="font-poppins text-[16px] text-slate-300 leading-6">Registre os Pareceres Finais das Monitorias</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] flex justify-between items-center">
+            <div class="flex flex-col gap-2">
+                <p class="font-poppins font-medium text-[15px] text-dashboard-secondary"> Resultados Pendentes</p>
+                <h3 class=" font-poppins font-bold text-[40px] text-dashboard-secondary leading-none">{{resumo.pendentes}}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-[#fef3c7] flex items-center justify-center text-[#d97706]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] flex justify-between items-center">
+            <div class="flex flex-col gap-2">
+                <p class="font-poppins font-medium text-[15px] text-dashboard-secondary"> Resultados Lançados</p>
+                <h3 class=" font-poppins font-bold text-[40px] text-dashboard-secondary leading-none">{{resumo.lancados}}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-[#dcfce3] flex items-center justify-center text-[#166534]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] flex justify-between items-center">
+            <div class="flex flex-col gap-2">
+                <p class="font-poppins font-medium text-[15px] text-dashboard-secondary"> Total de Monitores</p>
+                <h3 class=" font-poppins font-bold text-[40px] text-dashboard-secondary leading-none">{{resumo.total}}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-[#dbeafe] flex items-center justify-center text-[#1d4ed8]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full overflow-x-auto flex flex-col">
+        <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-6">Monitorias Pendentes de Resultados</h3>
+        @if (monitoriaPendentes.length > 0) {
+            <table class="w-full text-left border-collapse min-w-250">
+                <thead>
+                    <tr class="border-b border-dashboard-surface font-inter text-[14px] text-dashboard-muted">
+                        <th class="pb-4 font-normal">Matricula</th>
+                        <th class="pb-4 font-normal">Monitor</th>
+                        <th class="pb-4 font-normal">Disciplina</th>
+                        <th class="pb-4 font-normal">Semestre</th>
+                        <th class="pb-4 font-normal">Data Termino</th>
+                        <th class="pb-4 font-normal">Status</th>
+                        <th class="pb-4 font-normaln text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class=" font-inter text-[14px]">
+                    @for (item of monitoriaPendentes; track item.matricula) {
+                        <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
+                            <td class="py-5 font-bold text-dashboard-secondary">{{item.matricula}}</td>
+                            <td class="py-5 font-bold text-dashboard-secondary">{{item.monitor}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.disciplina}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.semestre}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.dataTermino}}</td>
+                            <td class="py-5">
+                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full bg-[#fef3c7] text-[#d97706]">
+                                    {{item.status}}
+                                </span>
+                            </td>
+                            <td class="py-6 flex justify-center gap-3">
+                                <button (click)="abrirModalLancamento(item)" class="text-dashboard-muted hover:text-dashboard-accent transition-colors p-2" title="Lançar Resultado">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                </button>
+                                <button (click)="abrirModalExcluirLancamento(item)" class="text-dashboard-muted hover:text-red-500 transition-colors p-2" title="Excluir">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @else {
+            <div class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-green-50/30 rounded-xl border border-dashed border-green-100">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h4 class="font-poppins font-bold text-[18px] text-dashboard-secondary mb-1">Tudo em dia!</h4>
+                <p class="font-inter text-[14px] text-dashboard-muted max-w-75">
+                Você não possui monitorias aguardando lançamento de parecer final.
+                </p>
+            </div>
+        }
+    </div>
+
+    <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full overflow-x-auto flex flex-col">
+        <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-6">Resultados Lançados</h3>
+        @if (resultadosLancados.length > 0) {
+            <table class="w-full text-left border-collapse min-w-250">
+                <thead>
+                    <tr class="border-b border-dashboard-surface font-inter text-[14px] text-dashboard-muted">
+                        <th class="pb-4 font-normal">Matricula</th>
+                        <th class="pb-4 font-normal">Monitor</th>
+                        <th class="pb-4 font-normal">Disciplina</th>
+                        <th class="pb-4 font-normal">Semestre</th>
+                        <th class="pb-4 font-normal">Alunos</th>
+                        <th class="pb-4 font-normal">Status</th>
+                        <th class="pb-4 font-normal">Data Lançamento</th>
+                    </tr>
+                </thead>
+                <tbody class=" font-inter text-[14px]">
+                    @for (item of resultadosLancados; track item.matricula) {
+                        <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
+                            <td class="py-5 font-bold text-dashboard-secondary">{{item.matricula}}</td>
+                            <td class="py-5 font-bold text-dashboard-secondary">{{item.monitor}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.disciplina}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.semestre}}</td>
+                            <td class="py-5 text-dashboard-muted">{{item.alunos}}</td>
+                            <td class="py-5">
+                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full bg-[#dcfce3] text-[#166534]">
+                                    {{item.parecer}}
+                                </span>
+                            </td>
+                            <td class="py-5 text-dashboard-muted">{{item.dataLancamento}}
+                            </td>
+                            <td class="py-5 flex justify-center">
+                                <button (click)="abrirModalEditarResultado(item)" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-2" title="Editar Resultado">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @else {
+            <div class="flex-1 flex flex-col items-center justify-center text-center p-8 opacity-60">
+                <div class="w-16 h-16 bg-dashboard-surface rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-dashboard-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <p class="font-inter text-[15px] text-dashboard-muted">Nenhum resultado lançado no histórico.</p>
+            </div>
+        }
+    </div>
+</div>
+@if (modalLancamentoAberto) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="relative bg-white rounded-2xl w-full max-w-150 overflow-hidden shadow-2xl p-8 mx-4 text-left flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-start mb-6 shrink-0">
+                <div>
+                    <h3 class="font-poppins font-bold text-[24px] text-dashboard-secondary">{{modoEdicao ? 'Editar resultado da monitoria' : 'Lançar Resultado da Monitoria'}}</h3>
+                    <p class="font-inter text-[14px] text-dashboard-muted mt-1 pr-8 leading-relaxed">{{modoEdicao ? 'Altere os Detalhes do Resultado da Monitoria' : 'Informe os Detalhes do Resultado da Monitoria'}}</p>
+                </div>
+                <button (click)="fecharModalLancamento()" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-1">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col gap-5 overflow-y-auto pr-2" style="scrollbar-width: thin;">
+                <div class="bg-dashboard-surface/50 rounded-[10px] p-5 flex flex-col">
+                    <p class="font-inter text-[14px] text-dashboard-muted">Monitor: <span class="font-medium text-dashboard-accent">{{monitorSelecionado?.monitor}}</span></p>
+                    <p class="font-inter text-[14px] text-dashboard-muted">Disciplina: <span class="font-medium text-dashboard-accent">{{monitorSelecionado?.disciplina}}</span></p>
+                    <p class="font-inter text-[14px] text-dashboard-muted">Semestre: <span 
+                    class="font-medium text-dashboard-accent">{{monitorSelecionado?.semestre}}</span></p>
+                </div>
+
+                <div class="flex flex-col gap-2 mt-2">
+                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Numero de Alunos Participantes</label>
+                    <input type="number" [(ngModel)]="dadosLancamentos.alunos" placeholder="Ex: 15" class="bg-dashboard-surface border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                </div>
+                <div class="flex flex-col gap-2 mt-2">
+                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Ocorrências</label>
+                    <textarea [(ngModel)]="dadosLancamentos.ocorrencias" rows="2" placeholder="Descreva Eventuais Ocorrências Durante a Monitoria (Opcional)" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70 resize-none"></textarea>
+                </div>
+                <div class="flex flex-col gap-2 mt-2">
+                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Parecer Final</label>
+                    <select [(ngModel)]="dadosLancamentos.parecer" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all cursor-pointer appearance-none">
+                        <option value="" disabled selected>Selecione o Parecer</option>
+                        <option value="Aprovado">Aprovado</option>
+                        <option value="Reprovado">Reprovado</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Observações Adicionais</label>
+                    <textarea [(ngModel)]="dadosLancamentos.observacoes" rows="2" placeholder="Comentarios Adicionais Sobre o Desempenho do Monitor" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70 resize-none"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end mt-6 pt-2 shrink-0">
+                <button (click)="salvarResultado()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-inter font-bold text-[14px] px-8 py-3.5 rounded-xl transition-colors shadow-md">
+                    {{modoEdicao ? 'Salvar Alteracao' : 'Salvar Resultado'}}
+                </button>
+            </div>
+        </div>
+    </div>
+}
+@if (modalExcluirAberto) {
+    <div class="fixed inset-0 z-60 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="bg-linear-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-3xl p-10 w-full max-w-125 shadow-2xl text-center relative mx-4">
+            <div class="mx-auto w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            <h3 class="font-poppins font-bold text-[24px] text-[#0f172a] mb-3">Confirmar Exclusão</h3>
+            <p class="font-dm-sans text-[15px] text-[#64748b] mb-8 leading-relaxed"> 
+                Você está prestes a excluir o resultado de <strong class="text-[#0f172a] uppercase">{{itemSelecionado?.monitor}}</strong>. Esta ação não poderá ser desfeita.
+            </p>
+
+            <div class="flex items-center justify-center gap-4">
+                <button (click)="fecharModalExcluirLancamento()" class="bg-white border border-dashboard-muted text-[#64748b] hover:bg-slate-50 font-dm-sans font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-sm">
+                    Cancelar
+                </button>
+                <button (click)="confirmarExclusao()" class="bg-dashboard-secondary hover:bg-[#1e293b] text-white font-inter font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-md">
+                    Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+}

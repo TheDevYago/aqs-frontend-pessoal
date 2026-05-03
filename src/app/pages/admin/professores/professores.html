@@ -1,0 +1,173 @@
+<div class="flex flex-col gap-6 w-full max-w-387.5 mx-auto">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Professor</h2>
+            <p class="font-poppins text-[16px] text-slate-300 leading-6">Gerencie os Professores Cadastradas no Sistema</p>
+        </div>
+
+        <button (click)="abrirModalNovoProfessor()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-inter font-medium text-[14px] px-6 py-3 rounded-[10px] transition-colors flex items-center gap-2 shadow-md">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Novo Professor
+        </button>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 flex items-center gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full">
+        <svg class="w-5 h-5 text-brand-muted/70 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" [(ngModel)]="tBusca" placeholder="Buscar Professres..." class="w-full bg-transparent border-none outline-none font-inter text-[15px] text-dashboard-secondary placeholder:text-dashboard-muted/70">
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full min-h-125 overflow-hidden">
+        <div class="flex border-b border-dashboard-surface">
+            <button (click)="mudarAba('ativos')" class="flex-1 py-4 text-center font-inter text-[14px] transition-all relative border-r border-dashboard-surface" [ngClass]="abaAtiva === 'ativos' ? 'text-dashboard-accent font-bold' : 'text-dashboard-muted hover:bg-slate-50'">
+                Ativos ({{ qtdAtivos }})
+                @if (abaAtiva === 'ativos') { <div class="absolute bottom-0 left-0 w-full h-0.5 bg-dashboard-accent"></div> }
+            </button>
+            <button (click)="mudarAba('inativos')" class="flex-1 py-4 text-center font-inter text-[14px] transition-all relative" [ngClass]="abaAtiva === 'inativos' ? 'text-dashboard-accent font-bold' : 'text-dashboard-muted hover:bg-slate-50'">
+                Inativos ({{ qtdInativos }})
+                @if (abaAtiva === 'inativos') { <div class="absolute bottom-0 left-0 w-full h-0.5 bg-dashboard-accent"></div> }
+            </button>
+        </div>
+
+        <div class="p-8">
+            @if (professoresFiltrados.length > 0) {
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-dashboard-surface font-inter text-[14px] text-dashboard-muted">
+                            <th class="pb-4 font-normal">Matricula</th>
+                            <th class="pb-4 font-normal">Nome</th>
+                            <th class="pb-4 font-normal">Email</th>
+                            <th class="pb-4 font-normal">Telefone</th>
+                            <th class="pb-4 font-normal">Escola</th>
+                            <th class="pb-4 font-normal">Data Cadastro</th>
+                            <th class="pb-4 font-normal text-center">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody class="font-inter text-[14px]">
+                        @for (prof of professoresFiltrados; track prof.matricula) {
+                            <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
+                                <th class="py-6 font-bold text-dashboard-secondary">{{prof.matricula}}</th>
+                                <th class="py-6 text-dashboard-muted">{{prof.nome}}</th>
+                                <th class="py-6 text-dashboard-muted">{{prof.email}}</th>
+                                <th class="py-6 text-dashboard-muted">{{prof.telefone}}</th>
+                                <th class="py-6 text-dashboard-muted">{{prof.escolaNome}}</th>
+                                <th class="py-6 text-dashboard-muted">{{prof.dataCadastro}}</th>
+                                <th class="py-6 flex justify-center gap-3">
+                                    <button (click)="abrirModalEditarProfessor(prof)" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-2" title="Editar">
+                                        <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    </button>
+                                    <button (click)="abrirModalInativarProfessor(prof)" class="text-dashboard-muted hover:text-amber-500 transition-colors p-2" title="Inativar">
+                                        <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
+                                    </button>
+                                </th>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            
+            @else {
+                <div class="flex flex-col items-center justify-center text-center py-12">
+                    <div class="w-20 h-20 bg-dashboard-surface rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-10 h-10 text-dashboard-muted/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+            
+                    <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-2">
+                        Nenhum professor encontrado
+                    </h3>
+            
+                    <p class="font-inter text-[15px] text-dashboard-muted max-w-100 leading-relaxed mb-8">
+                        @if (tBusca) {
+                            Não existem professores que correspondam à busca <span class="font-bold text-dashboard-secondary">"{{tBusca}}"</span> nesta categoria.
+                        } @else {
+                            Não há professores <span class="font-bold">{{ abaAtiva }}</span> registrados no sistema para esta escola.
+                        }
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (modalNovoProfessorAberto) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="relative bg-white rounded-2xl w-full max-w-175 overflow-hidden shadow-2xl p-8 mx-4 text-left">
+            <div class="relative z-10 flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="font-poppins font-bold text-[24px] text-dashboard-secondary">{{modoEdicao ? 'Editar Professor' : 'Cadastrar Novo Professor'}}</h3>
+                        <p class="font-inter text-[14px] text-dashboard-muted mt-1 pr-8 leading-relaxed">{{modoEdicao ? 'Atualize os dados do Professor no sitema' : 'Preencha os Dados Para Vinculá-lo ao Sistema'}}</p>
+                    </div>
+                    <button (click)="fecharModalNovoProfessor()" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-x-4 gap-y-5 mb-5">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Matricula</label>
+                        <input type="text" [(ngModel)]="novoProfessor.matricula" placeholder="ex:0000000" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Nome Completo</label>
+                        <input type="text" [(ngModel)]="novoProfessor.nome" placeholder="nome do professor" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Contato</label>
+                        <input type="email" [(ngModel)]="novoProfessor.email" placeholder="email@exemplo.com" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Telefone</label>
+                        <input type="text" [(ngModel)]="novoProfessor.telefone" placeholder="(00)00000-0000" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-5 mb-8">
+                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Escola</label>
+                    <select [(ngModel)]="novoProfessor.escola" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                        <option [ngValue]="null" disabled selected>Selecione Uma Escola</option>
+                        @for (escola of listEscolas; track escola.id) {
+                            <option [ngValue]="escola">{{ escola.nome }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-5 mb-8">
+                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Status</label>
+                    <select [(ngModel)]="novoProfessor.status" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                        <option [ngValue]="true">Ativo</option>
+                        <option [ngValue]="false">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button (click)="salvarNovoProfessor()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-poppins text-[14px] px-8 py-3.5 rounded-xl transition-colors shadow-md">
+                    {{modoEdicao ? 'Salvar Alterações' : 'Cadastrar Professor'}}
+                </button>
+            </div>
+        </div>
+    </div>
+}
+@if (modalInativarAberto) {
+    <div class="fixed inset-0 z-60 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="bg-linear-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-3xl p-10 w-full max-w-125 shadow-2xl text-center relative mx-4">
+            <div class="mx-auto w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            <h3 class="font-poppins font-bold text-[24px] text-[#0f172a] mb-3">Confirmar Inativação</h3>
+            <p class="font-dm-sans text-[15px] text-[#64748b] mb-8 leading-relaxed"> Você está prestes a inativar <strong class="text-[#0f172a] uppercase">{{professorSelecionado?.nome}}</strong>. Esta ação pode ser revertida posteriormente.
+            </p>
+
+            <div class="flex items-center justify-center gap-4">
+                <button (click)="fecharModalInativarProfessor()" class="bg-white border border-dashboard-muted text-[#64748b] hover:bg-slate-50 font-dm-sans font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-sm">
+                    Cancelar
+                </button>
+                <button (click)="confirmarInativacao()" class="bg-dashboard-secondary hover:bg-[#1e293b] text-white font-inter font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-md">
+                    Confirmar Inativacao
+                </button>
+            </div>
+        </div>
+    </div>
+}

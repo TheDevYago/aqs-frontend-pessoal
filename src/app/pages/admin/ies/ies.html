@@ -1,0 +1,140 @@
+<div class="flex flex-col gap-8 w-full max-w-387.5 mx-auto">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Instituição de Ensino Superior</h2>
+            <p class="font-poppins text-[16px] text-slate-300 leading-6">Gerencie as IES vinculadas ao sistema</p>
+        </div>
+
+        <button (click)="abrirModalNovaIes()" class="bg-[#0f172a] hover:bg-[#1e293b] text-white font-poppins font-medium text-[14px] px-6 py-3 rounded-[10px] transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Nova IES
+        </button>
+    </div>
+
+    <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full min-h-150 flex flex-col">
+        @if (listaIes.length > 0) {
+            <div class="p-8">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-[#f1f5f9] font-dm-sans text-[14px] text-[#64748b]">
+                            <th class="pb-4 font-normal">Nome</th>
+                            <th class="pb-4 font-normal">Endereço</th>
+                            <th class="pb-4 font-normal">Telefone</th>
+                            <th class="pb-4 font-normal">Status</th>
+                            <th class="pb-4 font-normal text-center">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="font-dm-sans text-[14px]">
+                        @for (ies of listaIes; track ies.nome){
+                            <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
+                                <td class="py-6 font-bold text-[#0f172a]">{{ies.nome}}</td>
+                                <td class="py-6 text-[#64748b]">{{ies.endereco}}</td>
+                                <td class="py-6 text-[#64748b]">{{ies.telefone}}</td>
+                                <td class="py-6">
+                                    <span class="text-[12px] font-medium px-4 py-1.5 rounded-full" [ngClass]="ies.status === 'Ativo' ? 'bg-dashboard-secondary text-white' : 'bg-slate-100 text-slate-500'">
+                                        {{ies.status ? 'Ativo' : 'Inativo'}}
+                                    </span>
+                                </td>
+                                <td class="py-6 flex justify-center gap-3">
+                                    <button (click)="abrirModalEditarIES(ies, $index)" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-2" title="Editar">
+                                        <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    </button>
+                                    <button (click)="abrirModalInativarIES(ies)" class="text-dashboard-muted hover:text-amber-500 transition-colors p-2" title="Inativar">
+                                        <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @else {
+            <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1" />
+                </svg>
+            </div>
+
+            <h3 class="font-poppins font-bold text-[22px] text-[#0f172a] mb-2">
+                Nenhuma IES cadastrada
+            </h3>
+            <p class="font-dm-sans text-[15px] text-[#64748b] max-w-100 leading-relaxed mb-8">
+                Atualmente não existem instituições vinculadas ao sistema. Cadastre a primeira para começar a gerenciar escolas e cursos.
+            </p>
+
+            <button (click)="abrirModalNovaIes()" class="bg-[#f1f5f9] hover:bg-slate-200 text-[#0f172a] font-poppins font-bold text-[14px] px-8 py-3.5 rounded-xl transition-all flex items-center gap-2 border border-slate-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4" stroke-linecap="round"/></svg>
+                Cadastrar Primeira IES
+            </button>
+        </div>
+        }
+    </div>
+</div>
+
+@if (modalInativarAberto) {
+    <div class="fixed inset-0 z-60 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="bg-linear-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-3xl p-10 w-full max-w-125 shadow-2xl text-center relative mx-4">
+            <div class="mx-auto w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            <h3 class="font-poppins font-bold text-[24px] text-[#0f172a] mb-3">Confirmar Inativação</h3>
+            <p class="font-dm-sans text-[15px] text-[#64748b] mb-8 leading-relaxed"> Você está prestes a inativar a instituição <strong class="text-[#0f172a] uppercase">{{iesSelecionada?.nome}}</strong>. Esta ação pode ser revertida posteriormente.
+            </p>
+
+            <div class="flex items-center justify-center gap-4">
+                <button (click)="fecharModalInativarIES()" class="bg-white border border-dashboard-muted text-[#64748b] hover:bg-slate-50 font-dm-sans font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-sm">
+                    Cancelar
+                </button>
+                <button (click)="confirmarInativacao()" class="bg-dashboard-secondary hover:bg-[#1e293b] text-white font-inter font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-md">
+                    Confirmar Inativacao
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (modalNovaIesAberto) {
+    <div class="fixed inset-0 flex items-center justify-center bg-[#0f172a]/40 backdrop-blur-[2px] transition-all">
+        <div class="relative bg-white rounded-2xl w-full max-w-150 overflow-hidden shadow-2xl p-8 mx-4 text-left">
+            <div class="relative z-10 flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="font-poppins font-bold text-[24px] text-[#0f172a]">{{modoEdicao ? 'Editar IES' : 'Nova IES'}}</h3>
+                        <p class="font-dm-sans text-[14px] text-[#64748b] mt-1 pr-8 leading-relaxed">{{modoEdicao ? 'Preencha as informações abaixo para editar a instituição de ensino superior.' : 'Preencha as informações abaixo para cadastrar uma nova instituição de ensino superior.'}}</p>
+                    </div>
+                    <button (click)="fecharModalNovaIes()" class="text-[#64748b] hover:text-[#0f172a] transition-colors p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="flex flex-col gap-4 mb-8">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-[#0f172a]">Nome da IES</label>
+                        <input type="text" [(ngModel)]="novaIes.nome" placeholder="Nome da Instiuição de Ensino Superior" class="bg-[#f1f5f9] border border-transparent focus:border-[#2563eb] focus:bg-white text-[#0f172a] font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-[#94a3b8]">
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-[#0f172a]">Endereço Completo</label>
+                        <input type="text" [(ngModel)]="novaIes.endereco" placeholder="Digite o Endereço Completo" class="bg-[#f1f5f9] border border-transparent focus:border-[#2563eb] focus:bg-white text-[#0f172a] font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-[#94a3b8]">
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-[#0f172a]">Telefone de Contato</label>
+                        <input type="text" [(ngModel)]="novaIes.telefone" placeholder="(XX) XXXXX-XXXX" class="bg-[#f1f5f9] border border-transparent focus:border-[#2563eb] focus:bg-white text-[#0f172a] font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-[#94a3b8]">
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button (click)="salvarNovaIes()" class="bg-[#0f172a] hover:bg-[#1e293b] text-white font-poppins font-bold text-[14px] px-8 py-3.5 rounded-xl transition-colors shadow-md">
+                        {{modoEdicao ? 'Salvar Alteracoes' : 'Cadastrar IES'}}
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}

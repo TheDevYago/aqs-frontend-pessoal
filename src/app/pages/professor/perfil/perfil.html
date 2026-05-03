@@ -1,0 +1,147 @@
+<div class="flex flex-col gap-8 w-full max-w-387.5 mx-auto pb-10">
+    <div>
+        <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Meu Perfil</h2>
+        <p class="font-poppins text-[16px] text-slate-300 leading-6">Gerencie suas Informações Pessoais e Formação Acadêmica</p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="bg-white border border-dashboard-surface shadow-[0px_4px_12px_rgba(0,0,0,0.03)] rounded-2xl p-8 xl:col-span-1 flex flex-col items-center">
+            <div class="relative group mb-6">
+                <div (click)="fileInput.click()" class="w-30 h-30 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden cursor-pointer border-4 border-white shadow-sm relative transition-all hover:ring-4 hover:ring-dashboard-accent/20">
+                    @if (fotoPreview) {
+                        <img [src]="fotoPreview" class="w-full h-full object-cover">
+                    } @else {
+                        <svg class="w-12 h-12 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    }
+                    <div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-6 h-6 text-white mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-white text-[9px] font-bold uppercase">Alterar</span>
+                    </div>
+                    <input #fileInput type="file" class="hidden" accept="image/*" (change)="SelecionarFoto($event)">
+                </div>
+            </div>
+            <h3 class="font-poppins font-bold text-[18px] text-dashboard-secondary mb-8 text-center">{{professor.nome}}</h3>
+            <div class="flex flex-col gap-5 w-full">
+                <div>
+                    <p class="font-inter text-[13px] text-dashboard-muted">Matricula</p>
+                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.matricula}}</p>
+                </div>
+                <div>
+                    <p class="font-inter text-[13px] text-dashboard-muted">Email</p>
+                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.email}}</p>
+                </div>
+                <div>
+                    <p class="font-inter text-[13px] text-dashboard-muted">Telefone</p>
+                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.telefone}}</p>
+                </div>
+                <div>
+                    <p class="font-inter text-[13px] text-dashboard-muted">Escolas</p>
+                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.escola?.nome}}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border-dashboard-surface shadow-[0px_4px_12px_rgba(0,0,0,0.03)] rounded-2xl p-8 xl:col-span-2">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-poppins font-bold text-[20px] text-shadow-dashboard-secondary">Formação Academida</h3>
+                <button (click)="abrirModal()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 transition-colors text-white px-5 py-2.5 rounded-lg font-inter font-medium text-[13px]">
+                    + Adicionar
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-4 min-h-75">
+                @if (formacoes.length > 0) {
+                    @for (formacao of formacoes; track $index) {
+                        <div class="bg-white rounded-xl p-5 flex justify-between items-start border border-dashboard-surface/50">
+                            <div>
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="bg-dashboard-accent/10 text-dashboard-accent px-3 py-1 rounded-full font-inter font-medium text-[11px]">{{formacao.nivel}}</span>
+                                    <span class="font-inter text-[13px] text-dashboard-muted">{{formacao.ano}}</span>
+                                </div>
+                                <h4 class="font-inter font-bold text-[16px] text-dashboard-secondary">{{formacao.curso}}</h4>
+                                <p class="font-inter text-[14px] text-dashboard-muted mt-0.5">{{formacao.instituicao}}</p>
+                            </div>
+
+                            <button (click)="removerFormacao($index)" class="text-red-400 hover:text-red-600 transition-colors mt-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    }
+                }
+
+                @else {
+                    <div class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-100">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                            </svg>
+                        </div>
+            
+                        <h4 class="font-poppins font-bold text-[18px] text-dashboard-secondary mb-1">
+                            Sua trajetória acadêmica
+                        </h4>
+                        <p class="font-inter text-[14px] text-dashboard-muted max-w-75 leading-relaxed mb-6">Adicione suas graduações, mestrados ou especializações para completar seu perfil profissional.</p>
+
+                        <button (click)="abrirModal()" class="text-dashboard-accent font-inter font-bold text-[13px] hover:underline">
+                            + Adicionar minha primeira formação
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@if (abrirModalFormacao) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="relative bg-white rounded-2xl w-full max-w-150 overflow-hidden shadow-2xl p-8 mx-4 text-left">
+            <div class="relative z-10 flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="font-poppins font-bold text-[24px] text-dashboard-secondary">Adicionar Formação</h3>
+                        <p class="font-inter text-[14px] text-dashboard-muted mt-1 pr-8 leading-relaxed">
+                        Adicione sua formação acadêmica para completar seu perfil.
+                        </p>
+                    </div>
+                    <button (click)="fecharModal()" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="flex flex-col gap-4 mb-8">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Categoria</label>
+                        <select [(ngModel)]="novaFormacao.categoria" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70 appearance-none cursor-pointer">
+                            <option value="" disabled selected>Selecione</option>
+                            <option value="Graduação">Graduação</option>
+                            <option value="Especialização">Especialização</option>
+                            <option value="Mestrado">Mestrado</option>
+                            <option value="Doutorado">Doutorado</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Instituição</label>
+                        <input type="text" [(ngModel)]="novaFormacao.instituicao" placeholder="Nome da Instituição" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Curso</label>
+                        <input type="text" [(ngModel)]="novaFormacao.curso" placeholder="Nome do Curso" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Ano de Conclusão</label>
+                        <input type="text" [(ngModel)]="novaFormacao.ano" placeholder="Ex: 2026" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button (click)="adicionarFormacao()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-inter font-bold text-[14px] px-8 p-3.5 rounded-xl transition-colors shadow-md">
+                        Adicionar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

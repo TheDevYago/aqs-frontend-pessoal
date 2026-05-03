@@ -1,0 +1,105 @@
+<div class="flex flex-col gap-6 w-full max-w-387.5 mx-auto">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Fechamento de Ciclo</h2>
+            <p class="font-poppins text-[16px] text-slate-300 leading-6">Encerre o Semestre e Consolide os Resultados</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 flex items-center justify-center gap-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full">
+        <div class="flex items-center gap-3">
+            <div [class]="currentStep >= 1 ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-muted'" class="w-10 h-10 rounded-full flex items-center justify-center font-inter font-bold transition-all">1</div>
+            <span class="font-poppins font-bold text-[14px]" [class]="currentStep >= 1 ? 'text-dashboard-secondary' : 'text-dashboard-muted'">Pendências</span>
+        </div>
+        <div class="w-20 h-0.5 bg-dashboard-surface">
+            <div [class]="currentStep >= 2 ? 'w-full' : 'w-0'" class="h-full bg-dashboard-secondary transition-all duration-500"></div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div [class]="currentStep >= 2 ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-muted'" class="w-10 h-10 rounded-full flex items-center justify-center font-inter font-bold transition-all">2</div>
+            <span class="font-poppins font-bold text-[14px]" [class]="currentStep >= 2 ? 'text-dashboard-secondary' : 'text-dashboard-muted'">Resumo</span>
+        </div>
+        <div class="w-20 h-0.5 bg-dashboard-surface">
+            <div [class]="currentStep >= 3 ? 'w-full' : 'w-0'" class="h-full bg-dashboard-secondary transition-all duration-500"></div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div [class]="currentStep >= 3 ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-muted'" class="w-10 h-10 rounded-full flex items-center justify-center font-inter font-bold transition-all">3</div>
+            <span class="font-poppins font-bold text-[14px]" [class]="currentStep >= 3 ? 'text-dashboard-secondary' : 'text-dashboard-muted'">Finalização</span>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full min-h-125 flex flex-col justify-between">
+        <div class="flex-1">
+            @if (currentStep === 1 ) {
+                <div class="animate-fade-in">
+                    <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-6">Monitorias Aguardando Resultado</h3>
+                    <div class="space-y-4">
+                        @for (item of pendencias; track item.disciplina) {
+                            <div class="flex items-center justify-between p-5 bg-dashboard-surface/50 border border-dashboard-surface rounded-xl">
+                                <div>
+                                    <p class="font-inter font-bold text-dashboard-secondary text-[16px]">{{item.disciplina}}</p>
+                                    <p class="font-inter text-[13px] text-dashboard-muted">Monitor: {{item.monitor}} • Prof: {{item.professor}}</p>
+                                </div>
+                                <span class="text-[11px] font-bold text-amber-600 bg-white px-4 py-1.5 rounded-full shadow-sm">PENDENTE</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (currentStep === 2) {
+                <div class="animate-fade-in text-center">
+                    <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-8">Consolidação de Dados - Ciclo 2026.1</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-200 mx-auto">
+                        <div class="p-8 bg-dashboard-surface/30 rounded-2xl border border-dashboard-surface text-left">
+                            <p class="font-inter text-[14px] text-dashboard-muted mb-2 font-medium">Alunos Atendidos</p>
+                            <p class="font-poppins font-bold text-[42px] text-dashboard-secondary leading-none">{{alunosAtendidos}}</p>
+                        </div>
+                        <div class="p-8 bg-dashboard-surface/30 rounded-2xl border border-dashboard-surface text-left">
+                            <p class="font-inter text-[14px] text-dashboard-muted mb-2 font-medium">Índice de Aprovação</p>
+                            <p class="font-poppins font-bold text-[42px] text-dashboard-secondary leading-none">{{indiceAprovado}}</p>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (currentStep === 3) {
+                <div class="animate-fade-in flex flex-col items-center justify-center py-10 text-center">
+                    <div class="w-20 h-20 bg-dashboard-surface text-dashboard-secondary rounded-full flex items-center justify-center mb-8 shadow-sm">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-poppins font-bold text-[24px] text-dashboard-secondary mb-4">Confirmar Encerramento</h3>
+                    <p class="font-inter text-[15px] text-dashboard-muted max-w-125 mb-10 leading-relaxed">
+                        Ao finalizar o ciclo, todos os dados atuais serão arquivados e o sistema será preparado para o próximo período. <strong>Esta ação é irreversível.</strong>
+                    </p>
+                    
+                    <label class="flex items-center gap-4 cursor-pointer group">
+                        <input type="checkbox" [(ngModel)]="confirmacaoCheck" class="peer appearance-none w-6 h-6 border-2 border-dashboard-surface rounded-md checked:bg-dashboard-secondary checked:border-dashboard-secondary transition-colors cursor-pointer">
+                        <span class="font-inter text-[15px] text-dashboard-secondary font-medium group-hover:text-dashboard-accent transition-colors">
+                            Estou ciente e desejo encerrar o ciclo 2026.1
+                        </span>
+                    </label>
+                </div>
+            }
+        </div>
+
+        <div class="flex justify-between items-center mt-12 pt-8 border-t border-dashboard-surface">
+            <button (click)="anterior()" [disabled]="currentStep === 1" class="px-8 py-3 text-dashboard-muted font-inter font-bold text-[14px] hover:bg-dashboard-surface rounded-xl transition-all disabled:opacity-0">
+                Voltar
+            </button>
+
+            @if (currentStep < totalSteps) {
+                <button (click)="proximo()" class="bg-dashboard-secondary text-white px-10 py-3 rounded-xl font-inter font-bold text-[14px] shadow-md transition-all hover:scale-105 active:scale-95">
+                    Próximo Passo
+                </button>
+            } @else {
+                <button (click)="finalizarCiclo()" [disabled]="!confirmacaoCheck" 
+                    class="bg-red-600 text-white px-10 py-3 rounded-xl font-inter font-bold text-[14px] shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100">
+                    Encerrar Ciclo
+                </button>
+            }
+        </div>
+
+    </div>
+</div>

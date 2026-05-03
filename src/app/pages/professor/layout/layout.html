@@ -1,0 +1,44 @@
+<div class="min-h-screen bg-[#001f3f] flex font-poppins">
+    <div class="fixed inset-0 left-[320px] pointer-events-none" style="background: radial-gradient(108.84% 161.25% at -4.03% 104.12%, rgba(1,53,64,0.45) 0%, rgba(65,104,112,0.45) 25%, rgba(128,154,160,0.135) 44.73%, rgba(246,247,237,0.45) 100%); transform: matrix(-1,0,0,1,0,0);"></div>
+
+    <aside class="w-[320px] bg-white flex flex-col border-r border-[#e5e7eb] z-10 shrink-0">
+        <div class="pt-10 pl-8 pb-8">
+            <h1 class="font-poppins font-bold text-[20px] leading-[30px] text-[#0f172a]">Sistema de Monitoria</h1>
+            <p class="font-poppins text-[14px] leading-[21px] text-[#64748b] mt-1">Professor</p>
+        </div>
+
+        <nav class="flex-1 px-6 space-y-2 overflow-y-auto mt-4">
+            <a routerLink="/professor/dashboard" routerLinkActive="bg-[#eff6ff] text-[#2563eb]" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-4 px-4 py-3 text-[#64748b] rounded-xl font-poppins font-medium text-[16px] transition-colors hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                Dashboard
+            </a>
+            <a routerLink="/professor/perfil" routerLinkActive="bg-[#eff6ff] text-[#2563eb]" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-4 px-4 py-3 text-[#64748b] rounded-xl font-poppins font-medium text-[16px] transition-colors hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Meu Perfil
+            </a>
+            <a routerLink="/professor/monitores" routerLinkActive="bg-[#eff6ff] text-[#2563eb]" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-4 px-4 py-3 text-[#64748b] rounded-xl font-poppins font-medium text-[16px] transition-colors hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                Meus Monitores
+            </a>
+            <a routerLink="/professor/resultados" routerLinkActive="bg-[#eff6ff] text-[#2563eb]" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-4 px-4 py-3 text-[#64748b] rounded-xl font-poppins font-medium text-[16px] transition-colors hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                Lançar Resultados
+            </a>
+            <a routerLink="/professor/historico" routerLinkActive="bg-[#eff6ff] text-[#2563eb]" [routerLinkActiveOptions]="{exact: true}" class="flex items-center gap-4 px-4 py-3 text-[#64748b] rounded-xl font-poppins font-medium text-[16px] transition-colors hover:bg-slate-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Histórico
+            </a>
+        </nav>
+
+        <div class="px-6 pb-12 mt-auto">
+            <a routerLink="/login" class="w-full flex items-center justify-center gap-2 px-4 h-12 border border-slate-300 text-black rounded-xl font-poppins font-medium text-[16px] hover:bg-slate-50 transition-colors cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Sair
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto overflow-x-hidden p-10 z-10 relative">
+        <router-outlet></router-outlet>
+    </main>
+</div>

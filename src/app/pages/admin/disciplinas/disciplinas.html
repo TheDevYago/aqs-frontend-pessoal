@@ -1,0 +1,183 @@
+<div class="flex flex-col gap-6 w-full max-w-387.5 mx-auto">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2 class="font-poppins font-bold text-[32px] text-white leading-12">Disciplinas</h2>
+            <p class="font-poppins text-[16px] text-slate-300 leading-6">Gerencie as Disciplinas e seus Pré-Requisitos</p>
+        </div>
+
+        <button (click)="abrirModalNovaDisciplina()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-inter font-medium text-[14px] px-6 py-3 rounded-[10px] transition-colors flex items-center gap-2 shadow-md">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Nova Disciplinas
+        </button>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 flex items-center gap-3 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full">
+        <svg class="w-5 h-5 text-brand-muted/70 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" [(ngModel)]="tbusca" placeholder="Buscar Disciplinas..." class="w-full bg-transparent border-none outline-none font-inter text-[15px] text-dashboard-secondary placeholder:text-dashboard-muted/70">
+    </div>
+
+    <div class="bg-white rounded-2xl p-8 shadow-[0px_4px_12px_rgba(0,0,0,0.03)] w-full min-h-125 flex flex-col">
+        @if (disciplinasFiltradas.length > 0) {
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-dashboard-surface font-inter text-[14px] text-dashboard-muted">
+                        <th class="pb-4 font-normal">Sigla</th>
+                        <th class="pb-4 font-normal">Nome</th>
+                        <th class="pb-4 font-normal">C.H</th>
+                        <th class="pb-4 font-normal">Escola</th>
+                        <th class="pb-4 font-normal">Matriz</th>
+                        <th class="pb-4 font-normal">Pré-Requisito</th>
+                        <th class="pb-4 font-normal">Status</th>
+                        <th class="pb-4 font-normal text-center">Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody class="font-poppins text-[14px]">
+                    @for (disc of disciplinasFiltradas; track disc.sigla) {
+                        <tr class="border-b border-dashboard-surface last:border-none hover:bg-slate-50 transition-colors">
+                            <td class="py-6 font-bold text-dashboard-secondary">{{disc.sigla}}</td>
+                            <td class="py-6 text-dashboard-secondary">{{disc.nome}}</td>
+                            <td class="py-6 text-dashboard-muted">{{disc.ch}}</td>
+                            <td class="py-6 text-dashboard-secondary">{{disc.escola}}</td>
+                            <td class="py-6 text-dashboard-muted">{{disc.matriz}}</td>
+                            <td class="py-6 text-dashboard-muted">{{disc.preRequisitosStr}}</td>
+                            <td class="py-6">
+                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full" [ngClass]="disc.status === 'Ativo' ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-secondary'">
+                                    {{disc.status}}
+                                </span>
+                            </td>
+                            <td class="py-6 flex justify-center gap-3">
+                                <button  (click)="abrirModalEditarDisciplinas(disc)" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-2" title="Editar">
+                                    <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
+                                <button (click)="abrirModalInativarDisciplina(disc)" class="text-dashboard-muted hover:text-amber-500 transition-colors p-2" title="Inativar">
+                                    <svg class="w-5 h-5 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/></svg>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @else {
+            <div class="flex-1 flex flex-col items-center justify-center text-center p-12">
+                <div class="w-20 h-20 bg-dashboard-surface rounded-full flex items-center justify-center mb-6">
+                    <svg class="w-10 h-10 text-dashboard-muted/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" />
+                    </svg>
+                </div>
+            
+                <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-2">Nenhuma disciplina encontrada</h3>
+            
+                <p class="font-inter text-[15px] text-dashboard-muted max-w-95 leading-relaxed mb-8">
+                    @if (tbusca) {
+                        Não encontramos disciplinas para a busca: <span class="font-bold text-dashboard-secondary">"{{tbusca}}"</span>. Verifique filtros ou termos digitados.
+                    } @else {
+                        As disciplinas são a base do conteúdo acadêmico. Clique abaixo para cadastrar a primeira disciplina e definir seus requisitos.
+                    }
+                </p>
+
+                <button (click)="abrirModalNovaDisciplina()" class="text-dashboard-accent font-inter font-bold text-[14px] flex items-center gap-2 hover:underline transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 4v16m8-8H4" stroke-linecap="round"/></svg>
+                    Adicionar Disciplina
+                </button>
+            </div>
+        }
+    </div>
+</div>
+@if (modalNovaDisciplinaAberta) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="relative bg-white rounded-2xl w-full max-w-150 overflow-hidden shadow-2xl p-8 mx-4 text-left">
+            <div class="relative z-10 flex flex-col">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="font-poppins font-bold text-[24px] text-dashboard-secondary">{{modoEdicao ? 'Editar Disciplina' : 'Cadastrar Nova Disciplina'}}</h3>
+                        <p class="font-inter text-[14px] text-dashboard-muted mt-1 pr-8 leading-relaxed">
+                            {{modoEdicao ? 'Preencha os Campos Abaixo para Editar uma Disciplina.' : 'Preencha os Campos Abaixo para Cadastrar uma Nova Disciplina.'}}
+                        </p>
+                    </div>
+                    <button (click)="fecharModalNovaDisciplina()" class="text-dashboard-muted hover:text-dashboard-secondary transition-colors p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-x-4 gap-y-5 mb-6">
+                    <div class="flex flex-col gap-2 col-span-1">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Sigla</label>
+                        <input type="text" [(ngModel)]="novaDisciplina.sigla" placeholder="Ex: Prog - I" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2 col-span-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Nome</label>
+                        <input type="text" [(ngModel)]="novaDisciplina.nome" placeholder="Programaçao I" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div>
+                    <div class="flex flex-col gap-2 col-span-1">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Carga Horaria</label>
+                        <input type="number" [(ngModel)]="novaDisciplina.ch" placeholder="Ex: 80" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all placeholder:text-dashboard-muted/70">
+                    </div> 
+                    <div class="flex flex-col gap-2 col-span-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Escola</label>
+                        <select [(ngModel)]="novaDisciplina.escola" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-dm-sans text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option [ngValue]="null" disabled selected>Selecione uma Escola</option>
+                            @for (esc of listaEscola; track esc.id){
+                                <option [ngValue]="esc">{{esc.nome}}</option>
+                            }
+                        </select>
+                    </div> 
+                    <div class="flex flex-col gap-2 col-span-3">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Matriz Curricular</label>
+                        <select [(ngModel)]="novaDisciplina.matriz" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option [ngValue]="null" disabled selected>Selecione uma Matriz</option>
+                            @for (matriz of listaMatriz; track matriz.id) {
+                                <option [ngValue]="matriz">{{matriz.nome}}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-2 col-span-3">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Pré-Requisitos</label>
+                        <select multiple [(ngModel)]="novaDisciplina.preRequisitosSelecionados" class="bg-white border border-dashboard-surface focus:bg-dashboard-accent text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-2 py-3 outline-none transition-all cursor-pointer min-h-30">
+                            @for (item of listaDisciplinasExistentes; track item.id) {
+                                <option [value]="item.nome">{{ item.nome }}</option>
+                            }
+                        </select>
+                        <p class="text-[12px] text-dashboard-muted/70 -mt-1">Mantenha Ctrl Pressionado Para Selecionar Mais de Um</p>
+                    </div>
+                    <div class="flex flex-col gap-2 col-span-3">
+                        <label class="font-poppins text-[14px] text-dashboard-secondary">Status</label>
+                        <select [(ngModel)]="novaDisciplina.status" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] rounded-[10px] px-4 py-3 outline-none transition-all cursor-pointer">
+                            <option [ngValue]="" disabled selected>Escolha um Estado</option>
+                            <option [ngValue]="true">Ativo</option>
+                            <option [ngValue]="false">Inativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-2">
+                    <button (click)="salvarNovaDisciplina()" class="bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-poppins font-bold text-[14px] px-8 py-3.5 rounded-xl transition-colors shadow-md">
+                        {{modoEdicao ? 'Salvar Alteracoes' : 'Cadastrar Disciplina'}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if(modalInativarAberto) {
+    <div class="fixed inset-0 z-60 flex items-center justify-center bg-dashboard-secondary/40 backdrop-blur-[2px] transition-all">
+        <div class="bg-linear-to-b from-[#F8FAFC] to-[#E2E8F0] rounded-3xl p-10 w-full max-w-125 shadow-2xl text-center relative mx-4">
+            <div class="mx-auto w-16 h-16 bg-[#0f172a] rounded-full flex items-center justify-center mb-6 shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            <h3 class="font-poppins font-bold text-[24px] text-[#0f172a] mb-3">Confirmar Inativação</h3>
+            <p class="font-dm-sans text-[15px] text-[#64748b] mb-8 leading-relaxed"> Você está prestes a inativar o curso de <strong class="text-[#0f172a] uppercase">{{disciplinaSelecionada?.nome}}</strong>. Esta ação pode ser revertida posteriormente.
+            </p>
+
+            <div class="flex items-center justify-center gap-4">
+                <button (click)="fecharModalInativarDisciplina()" class="bg-white border border-dashboard-muted text-[#64748b] hover:bg-slate-50 font-dm-sans font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-sm">
+                    Cancelar
+                </button>
+                <button (click)="confirmarInativacao()" class="bg-dashboard-secondary hover:bg-[#1e293b] text-white font-inter font-bold text-[14px] px-6 py-3.5 rounded-xl transition-colors w-full shadow-md">
+                    Confirmar Inativacao
+                </button>
+            </div>
+        </div>
+    </div>
+}

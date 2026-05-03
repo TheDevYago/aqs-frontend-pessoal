@@ -1,0 +1,37 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import 'tailwindcss';
+
+@theme {
+    --color-ucsal-blue: #001f3f;
+    --color-ucsal-blue-dark: #021829;
+    --color-ucsal-blue-light: #0A2A50;
+    --color-ucsal-lime: #DBE64C;
+    --color-ucsal-green: #74C365;
+    --color-ucsal-cream: #F6F7ED;
+
+    --color-dashboard-primary: #001F3F; 
+    --color-dashboard-secondary: #0F172A; 
+    --color-dashboard-accent: #2563EB;
+    --color-dashboard-muted: #64748B;     
+    --color-dashboard-surface: #F1F5F9;
+    
+
+    --font-syne: "Syne", sans-serif;
+    --font-dm-sans: "DM Sans", sans-serif;
+    --font-poppins: "Poppins", sans-serif;
+    --font-inter: "Inter", sans-serif;
+
+    --animate-shine: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {left: -100%;}
+    20% {left: 200%;}
+    100% {left: 200%;}
+}
+
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+    display: none;
+}
