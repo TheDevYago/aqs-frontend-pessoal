@@ -30,9 +30,14 @@ export class ProfessorService {
     return this.http.put<Professor>(`${this.API}/${matricula}`, professor);
   }
 
-  inativar(id: number) {
+  inativar(matricula: number) {
     this.limparCache();
-    return this.http.patch(`${this.API}/${id}/inativar`, {});
+    return this.http.patch(`${this.API}/${matricula}/inativar`, {});
+  }
+
+  reativar(matricula:number) {
+    this.limparCache();
+    return this.http.patch<void>(`${this.API}/${matricula}/reativar`, {});
   }
 
   buscarPorId(id: number) {

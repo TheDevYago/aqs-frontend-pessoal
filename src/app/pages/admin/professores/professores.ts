@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
@@ -18,6 +18,7 @@ export class Professores implements OnInit {
   private toastService = inject(ToastServ);
   private professorService = inject(ProfessorService);
   private escolaService = inject(EscolaService);
+  private cdr = inject(ChangeDetectorRef);
 
   tBusca: string = '';
   abaAtiva: 'ativos' | 'inativos' = 'ativos';
@@ -38,7 +39,10 @@ export class Professores implements OnInit {
 
   carregarDados() {
     this.professorService.listarTodos().subscribe({
-      next: (dados) => this.listaProfessores = dados,
+      next: (dados) => {
+        this.listaProfessores = dados;
+        this.cdr.detectChanges();
+      },
       error: () => this.toastService.exibir('Erro ao carregar professores', 'aviso')
     });
     this.escolaService.listarTodas().subscribe(dados => this.listEscolas = dados);
@@ -99,7 +103,7 @@ export class Professores implements OnInit {
     if (this.professorSelecionado) {
       this.professorSelecionado.status = false;
       const matricula = Number(this.professorSelecionado.matricula);
-      this.professorService.atualizar(matricula, this.professorSelecionado).subscribe({
+      this.professorService.inativar(matricula).subscribe({
         next: () => {
           this.toastService.exibir(`Professor(a) ${this.professorSelecionado?.nome} inativado(a)`, 'aviso');
           this.carregarDados();
@@ -135,5 +139,18 @@ export class Professores implements OnInit {
   fecharModalInativarProfessor() {
     this.modalInativarAberto = false;
     this.professorSelecionado = null;
+  }
+
+  toggleStatus(prof: Professor) {
+    if (prof.status) {
+      this.abrirModalInativarProfessor(prof);
+    } else {
+      this.professorService.reativar(Number(prof.matricula)).subscribe ({
+        next: () => {
+          this.toastService.exibir(`${prof.nome} reativado(a) com sucesso!`, 'sucesso');
+          this.carregarDados();
+        }
+      });
+    }
   }
 }
