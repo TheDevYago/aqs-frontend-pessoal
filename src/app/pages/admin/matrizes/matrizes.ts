@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { MatrizService } from '../../../core/services/matriz.service';
@@ -21,6 +21,7 @@ export class Matrizes implements OnInit {
   private matrizServ = inject(MatrizService);
   private cursoServ = inject(CursoService);
   private disciplinaServ = inject(DisciplinaService);
+  private cdr = inject(ChangeDetectorRef)
 
   tBusca: string = '';
   listaMatrizes: Matriz[] = [];
@@ -41,7 +42,10 @@ export class Matrizes implements OnInit {
 
   carregarDados() {
     this.matrizServ.listarTodos().subscribe({
-      next: (dados) => this.listaMatrizes = dados,
+      next: (dados) =>  {
+        this.listaMatrizes = dados;
+        this.cdr.detectChanges();
+      },
       error: () => this.toastService.exibir('Erro ao buscar matrizes da API', 'aviso')
     });
     this.cursoServ.listarTodos().subscribe(dados => this.listaCurso = dados);
@@ -60,32 +64,55 @@ export class Matrizes implements OnInit {
 
   salvarNovaMatriz() {
     if (this.novaMatriz.nome.trim() !== '') {
-      this.novaMatriz.disciplinas = this.disciplinasDisponiveis.filter(d => d.selecionada === true);
 
-      const operacao = this.modoEdicao ? this.matrizServ.atualizar(this.novaMatriz) : this.matrizServ.salvar(this.novaMatriz);
+      const dadosParaEnviar = {
+        id: this.modoEdicao ? this.novaMatriz.id : null,
+        nome: this.novaMatriz.nome,
+        descricao: this.novaMatriz.descricao,
+        status: this.novaMatriz.status === true,
+        cursoId: this.novaMatriz.curso?.id,
+      }
 
-      operacao.subscribe ({
-        next: () => {
-          this.toastService.exibir(this.modoEdicao ? 'Matriz Atualizada' : 'Nova Matriz Cadastrada');
-          this.carregarDados();
+      const operacao = this.modoEdicao ? this.matrizServ.atualizar(this.novaMatriz.id!, dadosParaEnviar as any) : this.matrizServ.salvar(dadosParaEnviar as any);
+
+      operacao.subscribe({
+        next: (matrizSalva) => {
+          if (this.modoEdicao) {
+            const index = this.listaMatrizes.findIndex(m => m.id === matrizSalva.id);
+            if (index !== -1) this.listaMatrizes[index] = { ...matrizSalva };
+            this.toastService.exibir('Matriz Atualizada', 'sucesso');
+          } else {
+            this.listaMatrizes.unshift(matrizSalva);
+            this.toastService.exibir('Nova Matriz Cadastrada', 'sucesso');
+          }
           this.fecharModalNovaMatriz();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastService.exibir('Erro ao salvar matriz.', 'erro'); 
         }
-      });
-    }
+    });
   }
+}
 
   confirmarInativacao () {
-    if(this.matrizSelecionada) {
-      this.matrizSelecionada.status = 'Inativo';
-      this.matrizServ.atualizar(this.matrizSelecionada).subscribe({
+    if (this.matrizSelecionada && this.matrizSelecionada.id) {
+      this.matrizServ.inativar(this.matrizSelecionada.id).subscribe({
         next: () => {
-          this.toastService.exibir(`A ${this.matrizSelecionada?.nome} foi inativada`, 'aviso');
-          this.carregarDados();
+          this.matrizSelecionada!.status = false;
+          this.toastService.exibir(`A matriz ${this.matrizSelecionada?.nome} foi inativada`, 'aviso');
           this.fecharModalInativarMatriz();
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toastService.exibir('Erro ao inativar matriz.', 'erro');
         }
-      });
+      })
     }
   }
+
 
   private resetMatriz(): Matriz {
     return { nome: '', descricao: '', curso: null as any, disciplinas: [], status: '' as any};
@@ -118,4 +145,19 @@ export class Matrizes implements OnInit {
     this.novaMatriz = { ...matriz };
     this.modalNovaMatrizAberta = true;
   }
+
+  toggleStatus(matriz: Matriz) {
+    if(matriz.status) {
+      this.abrirModalInativarMatrizes(matriz);
+    } else {
+      this.matrizServ.reativar(matriz.id!).subscribe({
+        next: () => {
+          matriz.status = true
+          this.toastService.exibir(`${matriz.nome} foi reativada!`, 'sucesso');
+          this.carregarDados();
+        }
+      });
+    }
+  }
+
 }

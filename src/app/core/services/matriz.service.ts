@@ -9,7 +9,7 @@ import { Matriz } from '../models/matriz.model';
 
 export class MatrizService {
   private http = inject(HttpClient);
-  private readonly API = `${environment.apiUrl}/matrizes`;
+  private readonly API = `${environment.apiUrl}/matriz`;
 
   listarTodos() {
     return this.http.get<Matriz[]>(this.API);
@@ -17,10 +17,20 @@ export class MatrizService {
   buscarPorId(id: number) {
     return this.http.get<Matriz>(`${this.API}/${id}`);
   }
-  salvar(matriz: Matriz) {
+  salvar(matriz: any) {
     return this.http.post<Matriz>(this.API, matriz);
   }
-  atualizar(matriz: Matriz) {
+  atualizar(id: number, matriz: any) {
     return this.http.put<Matriz>(`${this.API}/${matriz.id}`, matriz);
   }
+  inativar (id:number) {
+    return this.http.patch(`${this.API}/${id}/inativar`, {})
+  }
+  reativar(id: number) {
+    return this.http.patch(`${this.API}/${id}/reativar`, {});
+  }
+  vincularDisciplinas(matrizId: number, disciplinasIds: number[]) {
+    return this.http.post(`${this.API}/${matrizId}/disciplinas`, disciplinasIds);
+  }
+
 }
