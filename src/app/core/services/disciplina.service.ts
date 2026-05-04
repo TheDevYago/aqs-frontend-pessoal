@@ -9,7 +9,7 @@ import { Disciplina } from '../models/disciplina.model';
 
 export class DisciplinaService {
   private http = inject(HttpClient);
-  private readonly API = `${environment.apiUrl}/disciplinas`;
+  private readonly API = `${environment.apiUrl}/disciplina`;
 
   listarTodas() {
     return this.http.get<Disciplina[]>(this.API);
@@ -26,5 +26,9 @@ export class DisciplinaService {
 
   inativar(id: number) {
     return this.http.patch(`${this.API}/${id}/inativar`, {});
+  }
+
+  reativar (id:number) {
+    return this.http.patch(`${this.API}/${id}/reativar`, {});
   }
 }
