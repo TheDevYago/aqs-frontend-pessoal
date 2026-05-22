@@ -44,7 +44,7 @@ export class Disciplinas implements OnInit {
     this.disciplinaServ.listarTodas().subscribe({
       next: (dados) => {
         this.listaDisciplinas = dados;
-        this.listaDisciplinasExistentes = dados;
+        this.listaDisciplinasExistentes = dados.map(d => ({...d, selecionada: false}));
         this.cdr.detectChanges();
       },
       error: () => this.toastService.exibir('Erro ao carregar disciplinas', 'aviso')
@@ -71,8 +71,10 @@ export class Disciplinas implements OnInit {
   salvarNovaDisciplina() {
     if (this.novaDisciplina.descricao && this.novaDisciplina.descricao.trim() !== '') {
 
-      const stringRequisitos = this.novaDisciplina.preRequisitosSelecionados?.length ? this.novaDisciplina.preRequisitosSelecionados.join (', ') : '-'
-      
+      const requisitosSelecionados = this.listaDisciplinasExistentes.filter(d => d.selecionada).map(d => d.descricao);
+
+      const stringRequisitos = requisitosSelecionados.length ? requisitosSelecionados.join(', ') : '-'
+
       const dadosParaEnviar = {
         ...this.novaDisciplina,
         id: this.modoEdicao ? this.novaDisciplina.id : null,
@@ -81,11 +83,11 @@ export class Disciplinas implements OnInit {
         preRequisitosStr: stringRequisitos,
         escolaId: this.novaDisciplina.escola?.id,
         matrizId: this.novaDisciplina.matriz?.id,
-        status: this.novaDisciplina.status === true
+        status: this.novaDisciplina.status
       };
-      
+
       const operacao = this.modoEdicao ? this.disciplinaServ.atualizar(dadosParaEnviar as any) : this.disciplinaServ.salvar(dadosParaEnviar as any);
-      
+
       operacao.subscribe({
         next: (disciplinaSalva) => {
           if (this.modoEdicao) {
@@ -130,7 +132,10 @@ export class Disciplinas implements OnInit {
   abrirModalNovaDisciplina() {
     this.modalNovaDisciplinaAberta = true;
     this.modoEdicao = false;
-    this.novaDisciplina =  this.resetDisciplina();
+    this.novaDisciplina = this.resetDisciplina();
+    if (this.listaDisciplinasExistentes) {
+      this.listaDisciplinasExistentes.forEach(d => d.selecionada = false);
+    }
   }
 
   fecharModalNovaDisciplina() {
@@ -151,12 +156,24 @@ export class Disciplinas implements OnInit {
 
   abrirModalEditarDisciplinas(disciplina: Disciplina) {
     this.modoEdicao = true;
-    this.novaDisciplina = { ...disciplina };
-    if(disciplina.preRequisitosStr && disciplina.preRequisitosStr !== '-') {
-      this.novaDisciplina.preRequisitosSelecionados = disciplina.preRequisitosStr.split(', ');
-    } else {
-      this.novaDisciplina.preRequisitosSelecionados = [];
+    this.novaDisciplina = {...disciplina};
+
+    if (disciplina.escolaNome || (disciplina as any).escolaId) {
+      const idBusca = (disciplina as any).escolaId || disciplina.escola?.id;
+      this.novaDisciplina.escola = this.listaEscola.find(e => e.id === idBusca) || null as any;
     }
+
+    if (disciplina.matrizNome || (disciplina as any).matrizId) {
+      const idBusca = (disciplina as any).matrizId || disciplina.matriz?.id;
+      this.novaDisciplina.matriz = this.listaMatriz.find(m => m.id === idBusca) || null as any;
+    }
+
+    const arrayRequisitos = disciplina.preRequisitosStr && disciplina.preRequisitosStr !== '-' ? disciplina.preRequisitosStr.split(', ') : [];
+
+    this.listaDisciplinasExistentes.forEach(d => {
+      d.selecionada = arrayRequisitos.includes(d.descricao);
+    });
+
     this.modalNovaDisciplinaAberta = true;
   }
 
