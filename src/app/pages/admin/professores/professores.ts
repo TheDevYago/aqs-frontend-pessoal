@@ -22,9 +22,9 @@ export class Professores implements OnInit {
 
   tBusca: string = '';
   abaAtiva: 'ativos' | 'inativos' = 'ativos';
-  
+
   listaProfessores: Professor[] = [];
-  listEscolas: Escola[] = []; 
+  listEscolas: Escola[] = [];
 
   modalNovoProfessorAberto = false;
   modalInativarAberto = false;
@@ -48,11 +48,11 @@ export class Professores implements OnInit {
     this.escolaService.listarTodas().subscribe(dados => this.listEscolas = dados);
   }
 
-  get qtdAtivos() { 
-    return this.listaProfessores.filter(p => p.status === true).length; 
+  get qtdAtivos() {
+    return this.listaProfessores.filter(p => p.status === true).length;
   }
-  get qtdInativos() { 
-    return this.listaProfessores.filter(p => p.status === false).length; 
+  get qtdInativos() {
+    return this.listaProfessores.filter(p => p.status === false).length;
   }
 
   get professoresFiltrados() {
@@ -60,7 +60,7 @@ export class Professores implements OnInit {
     let filtrados = this.listaProfessores.filter(p => p.status ===statusDesejado);
 
     if (this.tBusca) {
-      filtrados = filtrados.filter(p => 
+      filtrados = filtrados.filter(p =>
         p.nome.toLowerCase().includes(this.tBusca.toLowerCase()) || p.matricula.toString().includes(this.tBusca)
       );
     }
@@ -77,11 +77,11 @@ export class Professores implements OnInit {
         nome: this.novoProfessor.nome,
         email: this.novoProfessor.email,
         telefone: this.novoProfessor.telefone,
-        escolaId: (this.novoProfessor.escola as any)?.id,
+        escolaId: this.novoProfessor.escolaId,
         status: this.novoProfessor.status === true || this.novoProfessor.status === 'Ativo',
       }
 
-      const operacao = this.modoEdicao 
+      const operacao = this.modoEdicao
         ? this.professorService.atualizar(professorDTO.matricula, professorDTO)
         : this.professorService.salvar(professorDTO);
 
@@ -114,7 +114,7 @@ export class Professores implements OnInit {
   }
 
   private resetProfessor(): Professor {
-    return { matricula: '', nome: '', email: '', telefone: '', escola: null, status: true, escolaNome: '' , dataCadastro: '' };
+    return { matricula: '', nome: '', email: '', telefone: '', escolaId: null, escola: null, status: true, escolaNome: '' , dataCadastro: '' };
   }
 
   abrirModalNovoProfessor() {

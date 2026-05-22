@@ -8,6 +8,7 @@ export interface Professor {
     email: string;
     telefone: string;
     escola?: any | null;
+    escolaId?: number | null;
     status: boolean | 'Ativo' | 'Inativo'; // Pode ser um booleano ou uma string para facilitar a exibição
     dataCadastro?: string;
     formacoes?: Formacao[];
