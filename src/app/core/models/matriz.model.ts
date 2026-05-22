@@ -5,9 +5,10 @@ export interface Matriz {
     nome: string;
     descricao: string;
     curso: any;
-    cursoNome?: string;    
+    cursoId?: number | null;
+    cursoNome?: string;
     qtdDisciplinas?: number;
     disciplinas?: any[];
-    status: boolean; 
+    status: boolean;
     dataCadastro?: string;
 }

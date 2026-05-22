@@ -33,7 +33,7 @@ export class Matrizes implements OnInit {
 
   matrizSelecionada: Matriz | null = null;
   novaMatriz: Matriz = this.resetMatriz();
-  
+
   disciplinasDisponiveis: any[] = [];
 
   ngOnInit() {
@@ -65,36 +65,41 @@ export class Matrizes implements OnInit {
   salvarNovaMatriz() {
     if (this.novaMatriz.nome.trim() !== '') {
 
+      const disciplinasIds = this.disciplinasDisponiveis.filter(d => d.selecionada).map(d => Number(d.id));
+
       const dadosParaEnviar = {
+
         id: this.modoEdicao ? this.novaMatriz.id : null,
         nome: this.novaMatriz.nome,
         descricao: this.novaMatriz.descricao,
         status: this.novaMatriz.status === true,
-        cursoId: this.novaMatriz.curso?.id,
+        cursoId: this.novaMatriz.cursoId,
       }
 
       const operacao = this.modoEdicao ? this.matrizServ.atualizar(this.novaMatriz.id!, dadosParaEnviar as any) : this.matrizServ.salvar(dadosParaEnviar as any);
 
       operacao.subscribe({
         next: (matrizSalva) => {
-          if (this.modoEdicao) {
-            const index = this.listaMatrizes.findIndex(m => m.id === matrizSalva.id);
-            if (index !== -1) this.listaMatrizes[index] = { ...matrizSalva };
-            this.toastService.exibir('Matriz Atualizada', 'sucesso');
-          } else {
-            this.listaMatrizes.unshift(matrizSalva);
-            this.toastService.exibir('Nova Matriz Cadastrada', 'sucesso');
-          }
-          this.fecharModalNovaMatriz();
-          this.cdr.detectChanges();
+          this.matrizServ.vincularDisciplinas(matrizSalva.id!, disciplinasIds).subscribe({
+            next: () => {
+              this.toastService.exibir(this.modoEdicao ? 'Matriz Atualizada' : 'Nova Matriz Cadastrada', 'sucesso');
+              this.fecharModalNovaMatriz();
+              this.carregarDados();
+            },
+            error: (err) => {
+              console.error('Erro ao vincular disciplinas', err);
+              this.toastService.exibir('Matriz salva, mas falhou ao vincular disciplinas.', 'aviso');
+              this.carregarDados();
+            }
+          });
         },
         error: (err) => {
           console.error(err);
-          this.toastService.exibir('Erro ao salvar matriz.', 'erro'); 
+          this.toastService.exibir('Erro ao salvar matriz.', 'erro');
         }
-    });
+      });
+    }
   }
-}
 
   confirmarInativacao () {
     if (this.matrizSelecionada && this.matrizSelecionada.id) {
@@ -115,7 +120,7 @@ export class Matrizes implements OnInit {
 
 
   private resetMatriz(): Matriz {
-    return { nome: '', descricao: '', curso: null as any, disciplinas: [], status: '' as any};
+    return { nome: '', descricao: '', curso: null as any, cursoId: null as any, disciplinas: [], status: '' as any};
   }
 
   abrirModalNovaMatriz() {
@@ -142,8 +147,27 @@ export class Matrizes implements OnInit {
 
   abrirModalEditarMatriz(matriz: Matriz) {
     this.modoEdicao = true;
-    this.novaMatriz = { ...matriz };
-    this.modalNovaMatrizAberta = true;
+
+    const idEncontrado = matriz.curso?.id || matriz.cursoId;
+    this.novaMatriz = { ...matriz, cursoId: idEncontrado ? Number(idEncontrado) : null};
+
+    this.disciplinasDisponiveis.forEach(d => d.selecionada = false);
+
+    this.matrizServ.listarDisciplinasMatriz(matriz.id!).subscribe({
+      next: (idsMatriz: number[]) => {
+        this.disciplinasDisponiveis.forEach(d => {
+          d.selecionada = idsMatriz.includes(d.id);
+        });
+
+        this.modalNovaMatrizAberta = true;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erro ao buscar disciplinas da matriz', err);
+        this.toastService.exibir('Erro ao carregar as disciplinas da matriz', 'erro');
+        this.modalNovaMatrizAberta = true;
+      }
+    });
   }
 
   toggleStatus(matriz: Matriz) {
