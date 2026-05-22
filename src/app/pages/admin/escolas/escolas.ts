@@ -33,7 +33,7 @@ export class Escolas implements OnInit {
   novaEscola: Escola = this.resetEscola();
 
   listaCoordenadores: any[] = [];
-  
+
   indexEdicao: number = -1;
 
   ngOnInit() {
@@ -59,20 +59,18 @@ export class Escolas implements OnInit {
 
   salvarNovaEscola(){
     if (this.novaEscola.nome.trim() !== '') {
-    
+
       const escolaDTO = {
         id: this.novaEscola.id,
         nome: this.novaEscola.nome,
-        iesId: this.novaEscola.ies?.id || (this.novaEscola as any).iesId,
-        // Extração segura da matrícula do coordenador
-        coordenadorId: (this.novaEscola.coordenador as any)?.matricula || (this.novaEscola as any).coordenadorId,
+        iesId: this.novaEscola.iesId,
+        coordenadorId: this.novaEscola.coordenadorId,
         status: this.novaEscola.status === 'Ativo' || this.novaEscola.status === true,
         dataCadastro: this.novaEscola.dataCadastro
       };
 
-
-      const operacao = this.modoEdicao 
-        ? this.escolaService.atualizar(escolaDTO.id!, escolaDTO) 
+      const operacao = this.modoEdicao
+        ? this.escolaService.atualizar(escolaDTO.id!, escolaDTO)
         : this.escolaService.salvar(escolaDTO);
 
       operacao.subscribe({
@@ -83,7 +81,7 @@ export class Escolas implements OnInit {
         },
         error: (err) => {
           console.error('Erro ao salvar escola:', err);
-          this.toastService.exibir('Erro ao salvar escola. Verifique o Coordenador.', 'erro');
+          this.toastService.exibir('Erro ao salvar escola.', 'erro');
         }
       });
     }
@@ -103,7 +101,7 @@ export class Escolas implements OnInit {
   }
 
   private resetEscola(): Escola {
-    return { id: undefined, nome: '', coordenadorId: null as any, coordenador: '', ies: null as any, status: '' as any };
+    return { id: undefined, nome: '', coordenadorId: null as any, coordenador: '', iesId: null as any, ies: null as any, status: '' as any };
   }
 
   get escolasFiltradas(){

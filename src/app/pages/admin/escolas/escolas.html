@@ -58,8 +58,8 @@
                     }
                 </tbody>
             </table>
-        } 
-        
+        }
+
         @else {
             <div class="flex-1 flex flex-col items-center justify-center text-center p-12">
                 <div class="w-20 h-20 bg-dashboard-surface rounded-full flex items-center justify-center mb-6">
@@ -67,11 +67,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                     </svg>
                 </div>
-            
+
                 <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-2">
                     Nenhuma escola encontrada
                 </h3>
-            
+
                 <p class="font-inter text-[15px] text-dashboard-muted max-w-95 leading-relaxed mb-8">
                     @if (tBusca) {
                         Não encontramos resultados para a busca: <span class="font-bold text-dashboard-secondary">"{{tBusca}}"</span>. Tente termos mais genéricos.
@@ -119,10 +119,10 @@
                     </div>
                     <div class="flex flex-col gap-2">
                         <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">IES Vinculada</label>
-                        <select [(ngModel)]="novaEscola.nomeIes" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all cursor-pointer">
+                        <select [(ngModel)]="novaEscola.iesId" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all cursor-pointer">
                             <option [ngValue]="null" disabled selected>Selecione uma IES</option>
                             @for (ies of listaIes; track ies.id) {
-                                <option [ngValue]="ies">{{ ies.nome }}</option>
+                                <option [ngValue]="ies.id">{{ ies.nome }}</option>
                             }
                         </select>
                     </div>

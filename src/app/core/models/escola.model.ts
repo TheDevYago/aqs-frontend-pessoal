@@ -6,8 +6,9 @@ export interface Escola {
     coordenadorId: number;
     coordenador?: any; // pra o objeto q vem do modal
     nomeCoordenador?: string; // para o nome q vem do java
-    ies?: any;
-    nomeIes?: string;         
+    ies?: Ies;
+    iesId?: number;
+    nomeIes?: string;
     dataCadastro?: string;
     status: boolean | string;
 }
