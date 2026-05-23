@@ -73,9 +73,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                 </div>
-            
+
                 <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-2">Nenhum monitor encontrado</h3>
-            
+
                 <p class="font-inter text-[15px] text-dashboard-muted max-w-95 leading-relaxed mb-8">
                     @if (tBusca) {
                         Não localizamos monitores que correspondam à busca <span class="font-bold text-dashboard-secondary">"{{tBusca}}"</span>. Tente buscar pelo nome ou matrícula.
@@ -120,13 +120,13 @@
                         </div>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Disciplina</label>
-                        <select [(ngModel)]="novoMonitor.disciplina" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70 cursor-pointer appearance-none">
-                            <option value="" disabled selected>Selecione uma Disciplina</option>
-                            <option value="Programação I">Programação I</option>
-                            <option value="Banco de Dados I">Banco de Dados I</option>
-                            <option value="Engenharia de Software">Engenharia de Software</option>
-                        </select>
+                      <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Disciplina</label>
+                      <select [(ngModel)]="novoMonitor.disciplina" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70 cursor-pointer appearance-none">
+                        <option value="" disabled selected>Selecione uma Disciplina</option>
+                        <option value="1">Programação Orientada a Objetos</option>
+                        <option value="2">Banco de Dados I</option>
+                        <option value="3">Engenharia de Software</option>
+                      </select>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-2">

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core'; // Adicionado ChangeDetectorRef
 import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { MonitoriaService } from '../../../core/services/monitoria.service';
@@ -12,13 +12,14 @@ import { Monitoria } from '../../../core/models/monitoria.model';
   templateUrl: './monitores.html',
   styleUrl: './monitores.css',
 })
-
 export class Monitores implements OnInit{
   private toastService = inject(ToastServ);
   private monitoriaServ = inject(MonitoriaService);
+  private cdr = inject(ChangeDetectorRef); // Injetado para forçar atualização da tela
+
+  idProfessorLogado: number = 10002; // A matrícula fixa do Professor Pedro
 
   tBusca: string = '';
-
   monitores: Monitoria[] = [];
   monitoresFiltrados: Monitoria[] = [];
 
@@ -29,16 +30,29 @@ export class Monitores implements OnInit{
   monitorSelecionado: Monitoria | null = null;
   novoMonitor: any = this.resetNovoMonitor();
 
-
   ngOnInit() {
-      this.carregarDados();
+    this.carregarDados();
   }
 
   carregarDados() {
-    this.monitoriaServ.listarTodas().subscribe({
-      next: (dados) => {
-        this.monitores = dados;
+    // IMPORTANTE: Atualize o seu MonitoriaService no Angular para apontar para essa nova URL '/monitorias/professor/10002'
+    this.monitoriaServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
+      next: (dados: any[]) => {
+        // TRADUTOR: Converte o DTO do Java para a Interface da Tabela
+        this.monitores = dados.map(d => ({
+          id: d.id,
+          matricula: d.alunoMatricula?.toString(),
+          nome: d.alunoNome || 'Sem Nome',
+          disciplina: d.disciplinaNome || 'Não Atribuída',
+          tipo: d.tipoMonitoria,
+          local: d.localAtuacao,
+          periodo: `${d.dataInicio} até ${d.dataFim}`, // Concatena as datas
+          alunos: 0, // Como não rastreamos quantidade de alunos, deixamos em 0
+          status: d.status ? 'Ativo' : 'Inativo' // Transforma Boolean em Texto
+        }));
+
         this.filtrarMonitores();
+        this.cdr.detectChanges(); // Redesenha a tela
       },
       error: () => this.toastService.exibir('Erro ao carregar monitorias', 'aviso')
     });
@@ -92,8 +106,9 @@ export class Monitores implements OnInit{
   abrirModalEditarMonitor(monitor: Monitoria) {
     this.modoEdicao = true;
     this.novoMonitor = {...monitor};
-    if (monitor.periodo && monitor.periodo.includes(' - ')) {
-      const datas = monitor.periodo.split(' - ');
+
+    if (monitor.periodo && monitor.periodo.includes(' até ')) {
+      const datas = monitor.periodo.split(' até ');
       this.novoMonitor.dataInicio = datas[0];
       this.novoMonitor.dataTermino = datas[1];
     }
@@ -101,29 +116,33 @@ export class Monitores implements OnInit{
   }
 
   salvarNovoMonitor() {
-
-    const dadosParaSalvar = {
-      matricula: this.novoMonitor.matricula,
-      nome: this.novoMonitor.nome,
-      disciplina: this.novoMonitor.disciplina,
-      tipo: this.novoMonitor.tipo,
-      local: this.novoMonitor.local,
-      periodo: `${this.novoMonitor.dataInicio} - ${this.novoMonitor.dataTermino}`,
-      alunos: this.modoEdicao && this.novoMonitor.alunos ? this.novoMonitor.alunos: 0,
-      status: this.novoMonitor.status
+    const payload = {
+      id: this.modoEdicao ? this.novoMonitor.id : null,
+      alunoMatricula: Number(this.novoMonitor.matricula),
+      alunoNome: this.novoMonitor.nome,
+      disciplinaId: Number(this.novoMonitor.disciplina),
+      tipoMonitoria: this.novoMonitor.tipo,
+      semestre: this.novoMonitor.semestre,
+      localAtuacao: this.novoMonitor.local,
+      dataInicio: this.novoMonitor.dataInicio,
+      dataFim: this.novoMonitor.dataTermino,
+      status: this.novoMonitor.status === true || this.novoMonitor.status === 'Ativo',
+      professorOrientadorMatricula: this.idProfessorLogado
     };
 
-    const operacao = this.modoEdicao ? this.monitoriaServ.atualizar(dadosParaSalvar) : this.monitoriaServ.salvar(dadosParaSalvar);
+    // Usando 'any' temporariamente para contornar a tipagem estrita no envio do DTO
+    const operacao = this.modoEdicao ? this.monitoriaServ.atualizar(payload as any) : this.monitoriaServ.salvar(payload as any);
 
     operacao.subscribe({
       next: () => {
         this.toastService.exibir(this.modoEdicao ? 'Monitoria atualizada com sucesso' : 'Novo Monitor cadastrado com sucesso', 'sucesso');
         this.carregarDados();
-        this.fecharModalExclusaoMonitoria();
+        this.fecharModalNovaMonitoria(); // CORREÇÃO: Fechando o modal correto (estava fecharModalExclusaoMonitoria)
       },
-      error: () => {
-        this.toastService.exibir('Erro ao excluir monitoria', 'aviso');
-        this.fecharModalExclusaoMonitoria();
+      error: (err) => {
+        console.error("🔍 Erro da API ao salvar:", err);
+        const mensagemServidor = err.error?.mensagem || err.error?.message || 'Erro interno de banco de dados.';
+        this.toastService.exibir(mensagemServidor, 'aviso');
       }
     });
   }

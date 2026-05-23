@@ -13,16 +13,24 @@ export class MonitoriaService {
   listarTodas() {
     return this.http.get<Monitoria[]>(this.API);
   }
+
   listarPorId(id: number) {
     return this.http.get<Monitoria>(`${this.API}/${id}`);
   }
+
   salvar(monitoria: Monitoria) {
     return this.http.post<Monitoria>(this.API, monitoria);
   }
+
   atualizar(monitoria: Monitoria){
     return this.http.put<Monitoria>(`${this.API}/${monitoria.id}`, monitoria);
   }
+
   excluir(id: number) {
     return this.http.delete(`${this.API}/${id}`);
+  }
+
+  buscarPorProfessor(matricula: number) {
+    return this.http.get<any[]>(`${this.API}/professor/${matricula}`);
   }
 }
