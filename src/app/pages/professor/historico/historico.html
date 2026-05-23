@@ -69,16 +69,22 @@
                             <td class="py-5 text-dashboard-muted">{{item.disciplina}}</td>
                             <td class="py-5 text-dashboard-muted">{{item.semestre}}</td>
                             <td class="py-5 text-center">
-                                <span class="text-[11px] font-medium px-4 py-1.5 rounded-full bg-dashboard-secondary text-white">
-                                    {{item.tipo}}
-                                </span>
+                                  <span class="text-[11px] font-medium px-4 py-1.5 rounded-full"
+                                        [ngClass]="item.tipo === 'Presencial' ? 'bg-dashboard-secondary text-white' : 'bg-dashboard-surface text-dashboard-secondary'">
+                                      {{item.tipo}}
+                                  </span>
                             </td>
                             <td class="py-5 text-dashboard-muted"> {{item.periodo}}</td>
                             <td class="py-5 text-dashboard-accent text-center font-bold">{{item.alunos}}</td>
                             <td class="py-5 text-center">
-                                <span class="text-[12px] font-medium px-4 py-1.5 rounded-full" [ngClass]="item.parecer === 'Aprovado' ? 'bg-[#dcfce3] text-[#166534]' : 'bg-[#fef3c7] text-[#d97706]'">
-                                    {{item.parecer}}
-                                </span>
+                                  <span class="text-[12px] font-medium px-4 py-1.5 rounded-full"
+                                        [ngClass]="{
+                                            'bg-[#dcfce3] text-[#166534]': item.parecer === 'Aprovado',
+                                            'bg-red-100 text-red-700': item.parecer === 'Reprovado',
+                                            'bg-[#fef3c7] text-[#d97706]': item.parecer === 'Em Andamento'
+                                        }">
+                                      {{item.parecer}}
+                                  </span>
                             </td>
                         </tr>
                     }

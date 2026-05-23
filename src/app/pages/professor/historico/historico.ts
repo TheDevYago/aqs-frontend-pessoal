@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { ResultadoService } from '../../../core/services/resultado.service';
+import {MonitoriaService} from '../../../core/services/monitoria.service';
 
 @Component({
   selector: 'app-historico',
@@ -14,31 +15,61 @@ import { ResultadoService } from '../../../core/services/resultado.service';
 export class Historico implements OnInit {
   private toastService = inject(ToastServ);
   private resultadoServ = inject(ResultadoService);
+  private monitorServ = inject(MonitoriaService);
+  private cdr = inject(ChangeDetectorRef);
 
+  idProfessorLogado: number = 10002;
 
   resumo = {
     totalMonitorias: 0,
     alunosAtendidos: 0,
     disciplinas: 0
   };
-  
+
   tBusca: string = '';
 
   historico: any[] = [];
   historicoFiltrado: any[] = [];
-  
+
   ngOnInit() {
     this.carregarDados();
   }
 
   carregarDados(){
+    // 1. Busca primeiro os resultados
     this.resultadoServ.listarTodos().subscribe({
-      next: (dados) => {
-        this.historico = dados;
-        this.atualizarResumo();
-        this.filtrarHistorico();
+      next: (resultados) => {
+        // 2. Busca todas as monitorias do professor
+        this.monitorServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
+          next: (monitorias: any[]) => {
+
+            // 3. A MÁGICA: Cruza os dados das duas tabelas
+            this.historico = monitorias.map(m => {
+              // Procura se existe um resultado lançado para a monitoria atual
+              const resultadoLancado = resultados.find(r => r.idMonitoria === m.id);
+
+              return {
+                id: m.id,
+                matricula: m.alunoMatricula?.toString(),
+                monitor: m.alunoNome || 'Sem Nome',
+                disciplina: m.disciplinaNome || 'Não Atribuída',
+                semestre: m.semestre || '',
+                tipo: m.tipoMonitoria || 'Presencial',
+                periodo: `${m.dataInicio} até ${m.dataFim}`,
+                alunos: m.alunos || 0,
+                // Se achou o resultado, coloca Aprovado/Reprovado. Se não, está Em Andamento!
+                parecer: resultadoLancado ? resultadoLancado.parecer : 'Em Andamento'
+              };
+            });
+
+            this.atualizarResumo();
+            this.filtrarHistorico();
+            this.cdr.detectChanges(); // Atualiza a tela imediatamente
+          },
+          error: () => this.toastService.exibir('Erro ao carregar monitorias', 'aviso')
+        });
       },
-      error: () => this.toastService.exibir('Erro ao carregar o histórico', 'aviso')
+      error: () => this.toastService.exibir('Erro ao carregar resultados do histórico', 'aviso')
     });
   }
 
@@ -47,9 +78,10 @@ export class Historico implements OnInit {
       this.historicoFiltrado = [...this.historico];
     } else {
       const termo = this.tBusca.toLowerCase();
-      this.historicoFiltrado = this.historico.filter(h => 
+      this.historicoFiltrado = this.historico.filter(h =>
         (h.monitor && h.monitor.toLowerCase().includes(termo)) ||
-        (h.disciplina && h.disciplina.toLowerCase().includes(termo)) || (h.matricula && h.matricula.includes(termo))
+        (h.disciplina && h.disciplina.toLowerCase().includes(termo)) ||
+        (h.matricula && h.matricula.includes(termo))
       );
     }
   }
@@ -60,6 +92,4 @@ export class Historico implements OnInit {
     const disciplinasUnicas = new Set(this.historico.map(item => item.disciplina));
     this.resumo.disciplinas = disciplinasUnicas.size;
   }
-
-  
 }
