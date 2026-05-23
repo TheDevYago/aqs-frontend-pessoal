@@ -115,8 +115,13 @@
                             <input type="text" [(ngModel)]="novoMonitor.matricula" placeholder="Ex: 2026001" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
                         </div>
                         <div class="flex flex-col gap-2">
-                            <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Nome Completo</label>
-                            <input type="text" [(ngModel)]="novoMonitor.nome" placeholder="Nome do Aluno" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                          <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Nome Completo</label>
+                          <input type="text" [(ngModel)]="novoMonitor.nome" (ngModelChange)="preencherMatriculaAutomatica()" list="listaAlunos" placeholder="Nome do Aluno" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                          <datalist id="listaAlunos">
+                            @for (aluno of alunosCadastrados; track aluno.matricula) {
+                              <option [value]="aluno.nome"></option>
+                            }
+                          </datalist>
                         </div>
                     </div>
                     <div class="flex flex-col gap-2">
@@ -125,7 +130,7 @@
                         <option value="" disabled selected>Selecione uma Disciplina</option>
                         <option value="1">Programação Orientada a Objetos</option>
                         <option value="2">Banco de Dados I</option>
-                        <option value="3">Engenharia de Software</option>
+                        <option value="3">Desenvolvimento Web</option>
                       </select>
                     </div>
                     <div class="grid grid-cols-2 gap-4">

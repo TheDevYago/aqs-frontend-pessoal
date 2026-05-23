@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { MonitoriaService } from '../../../core/services/monitoria.service';
 import { Monitoria } from '../../../core/models/monitoria.model';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-monitores',
@@ -15,13 +17,15 @@ import { Monitoria } from '../../../core/models/monitoria.model';
 export class Monitores implements OnInit{
   private toastService = inject(ToastServ);
   private monitoriaServ = inject(MonitoriaService);
-  private cdr = inject(ChangeDetectorRef); // Injetado para forçar atualização da tela
+  private cdr = inject(ChangeDetectorRef);
+  private http = inject(HttpClient);
 
   idProfessorLogado: number = 10002; // A matrícula fixa do Professor Pedro
 
   tBusca: string = '';
   monitores: Monitoria[] = [];
   monitoresFiltrados: Monitoria[] = [];
+  alunosCadastrados: any[] = [];
 
   modalNovoMonitorAberto: boolean = false;
   modalExcluirAberto:boolean = false;
@@ -32,30 +36,54 @@ export class Monitores implements OnInit{
 
   ngOnInit() {
     this.carregarDados();
+    this.carregarAlunos();
   }
 
   carregarDados() {
-    // IMPORTANTE: Atualize o seu MonitoriaService no Angular para apontar para essa nova URL '/monitorias/professor/10002'
     this.monitoriaServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
       next: (dados: any[]) => {
-        // TRADUTOR: Converte o DTO do Java para a Interface da Tabela
         this.monitores = dados.map(d => ({
           id: d.id,
           matricula: d.alunoMatricula?.toString(),
           nome: d.alunoNome || 'Sem Nome',
           disciplina: d.disciplinaNome || 'Não Atribuída',
+          disciplinaId: d.disciplinaId?.toString(),
+          semestre: d.semestre || '',
+          statusBool: d.status,
           tipo: d.tipoMonitoria,
           local: d.localAtuacao,
-          periodo: `${d.dataInicio} até ${d.dataFim}`, // Concatena as datas
-          alunos: 0, // Como não rastreamos quantidade de alunos, deixamos em 0
-          status: d.status ? 'Ativo' : 'Inativo' // Transforma Boolean em Texto
+          periodo: `${d.dataInicio} até ${d.dataFim}`,
+          alunos: 0,
+          status: d.status ? 'Ativo' : 'Inativo'
         }));
 
         this.filtrarMonitores();
-        this.cdr.detectChanges(); // Redesenha a tela
+        this.cdr.detectChanges();
       },
       error: () => this.toastService.exibir('Erro ao carregar monitorias', 'aviso')
     });
+  }
+
+  carregarAlunos() {
+    this.http.get<any[]>(`${environment.apiUrl}/alunos-monitor`).subscribe({
+      next: (dados) => {
+        this.alunosCadastrados = dados;
+      },
+      error: (err) => console.error("Erro ao carregar lista de alunos", err)
+    });
+  }
+
+  preencherMatriculaAutomatica() {
+    if (!this.novoMonitor.nome) return;
+
+    // Procura no array um aluno com o nome exato que foi selecionado/digitado
+    const alunoEncontrado = this.alunosCadastrados.find(
+      a => a.nome.toLowerCase() === this.novoMonitor.nome.toLowerCase()
+    );
+
+    if (alunoEncontrado) {
+      this.novoMonitor.matricula = alunoEncontrado.matricula;
+    }
   }
 
   filtrarMonitores() {
@@ -103,9 +131,12 @@ export class Monitores implements OnInit{
     this.monitorSelecionado = null;
   }
 
-  abrirModalEditarMonitor(monitor: Monitoria) {
+  abrirModalEditarMonitor(monitor: any) {
     this.modoEdicao = true;
     this.novoMonitor = {...monitor};
+    this.novoMonitor.disciplina = monitor.disciplinaId;
+    this.novoMonitor.status = monitor.statusBool;
+    this.novoMonitor.semestre = monitor.semestre;
 
     if (monitor.periodo && monitor.periodo.includes(' até ')) {
       const datas = monitor.periodo.split(' até ');
