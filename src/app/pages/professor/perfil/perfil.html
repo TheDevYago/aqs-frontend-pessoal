@@ -20,25 +20,50 @@
                     <input #fileInput type="file" class="hidden" accept="image/*" (change)="SelecionarFoto($event)">
                 </div>
             </div>
-            <h3 class="font-poppins font-bold text-[18px] text-dashboard-secondary mb-8 text-center">{{professor.nome}}</h3>
-            <div class="flex flex-col gap-5 w-full">
-                <div>
-                    <p class="font-inter text-[13px] text-dashboard-muted">Matricula</p>
-                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.matricula}}</p>
-                </div>
-                <div>
-                    <p class="font-inter text-[13px] text-dashboard-muted">Email</p>
-                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.email}}</p>
-                </div>
-                <div>
-                    <p class="font-inter text-[13px] text-dashboard-muted">Telefone</p>
-                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.telefone}}</p>
-                </div>
-                <div>
-                    <p class="font-inter text-[13px] text-dashboard-muted">Escolas</p>
-                    <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.escola?.nome}}</p>
-                </div>
+          @if (modoEdicao) {
+            <div class="w-full mb-6">
+              <label class="font-inter text-[13px] text-dashboard-muted">Nome Completo</label>
+              <input type="text" [(ngModel)]="formData.nomeCompleto" class="w-full bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-2.5 rounded-[10px] outline-none transition-all mt-1">
             </div>
+          } @else {
+            <h3 class="font-poppins font-bold text-[18px] text-dashboard-secondary mb-8 text-center">{{professor.nome}}</h3>
+          }
+
+          <div class="flex flex-col gap-5 w-full">
+            <div>
+              <p class="font-inter text-[13px] text-dashboard-muted">Matrícula <span class="text-[10px] text-slate-300 ml-1">(Fixo)</span></p>
+              <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.matricula}}</p>
+            </div>
+            <div>
+              <p class="font-inter text-[13px] text-dashboard-muted">Email</p>
+              @if (modoEdicao) {
+                <input type="email" [(ngModel)]="formData.email" class="w-full bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-2.5 rounded-[10px] outline-none transition-all mt-1">
+              } @else {
+                <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.email}}</p>
+              }
+            </div>
+            <div>
+              <p class="font-inter text-[13px] text-dashboard-muted">Telefone</p>
+              @if (modoEdicao) {
+                <input type="text" [(ngModel)]="formData.telefone" class="w-full bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-2.5 rounded-[10px] outline-none transition-all mt-1">
+              } @else {
+                <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.telefone}}</p>
+              }
+            </div>
+            <div>
+              <p class="font-inter text-[13px] text-dashboard-muted">Escola Lotada</p>
+              <p class="font-inter font-bold text-[16px] text-dashboard-secondary mt-0.5">{{professor.escola?.nome}}</p>
+            </div>
+
+            <div class="mt-4 flex gap-3">
+              @if (modoEdicao) {
+                <button (click)="cancelarEdicao()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-dashboard-secondary font-inter font-bold text-[13px] py-3 rounded-xl transition-colors">Cancelar</button>
+                <button (click)="salvarAlteracoes()" class="flex-1 bg-dashboard-secondary hover:bg-dashboard-secondary/90 text-white font-inter font-bold text-[13px] py-3 rounded-xl transition-colors shadow-md">Salvar</button>
+              } @else {
+                <button (click)="ativarEdicao()" class="w-full bg-dashboard-surface hover:bg-slate-200 text-dashboard-secondary font-inter font-bold text-[13px] py-3 rounded-xl transition-colors">Editar Perfil</button>
+              }
+            </div>
+          </div>
         </div>
 
         <div class="bg-white border-dashboard-surface shadow-[0px_4px_12px_rgba(0,0,0,0.03)] rounded-2xl p-8 xl:col-span-2">
@@ -79,7 +104,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                             </svg>
                         </div>
-            
+
                         <h4 class="font-poppins font-bold text-[18px] text-dashboard-secondary mb-1">
                             Sua trajetória acadêmica
                         </h4>

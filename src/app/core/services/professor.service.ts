@@ -43,10 +43,11 @@ export class ProfessorService {
   buscarPorId(id: number) {
     return this.http.get<Professor>(`${this.API}/${id}`);
   }
-  uploadFoto(id: number, arquivo: File){
+
+  uploadFoto(matricula: number, arquivo: File) {
     const formData = new FormData();
-    formData.append('foto', arquivo) // tem q bater com o RequestParam
-    return this.http.post(`${this.API}/${id}/foto`, formData);
+    formData.append('foto', arquivo);
+    return this.http.patch(`${this.API}/${matricula}/foto`, formData);
   }
 
   limparCache() {
