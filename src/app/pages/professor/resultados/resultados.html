@@ -165,8 +165,8 @@
                 </div>
 
                 <div class="flex flex-col gap-2 mt-2">
-                    <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Numero de Alunos Participantes</label>
-                    <input type="number" [(ngModel)]="dadosLancamentos.alunos" placeholder="Ex: 15" class="bg-dashboard-surface border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                  <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Número de Alunos Participantes</label>
+                  <input type="number" [(ngModel)]="dadosLancamentos.alunos" readonly title="Este valor é definido no cadastro do monitor" class="bg-slate-100 cursor-not-allowed border border-transparent text-dashboard-muted font-inter font-medium text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all">
                 </div>
                 <div class="flex flex-col gap-2 mt-2">
                     <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Ocorrências</label>

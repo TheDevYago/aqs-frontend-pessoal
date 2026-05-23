@@ -161,12 +161,18 @@
                             <input type="date" [(ngModel)]="novoMonitor.dataTermino" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all">
                         </div>
                     </div>
-                    <div class="flex flex-col gap-2">
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="flex flex-col gap-2">
+                        <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Qtd. de Alunos</label>
+                        <input type="number" [(ngModel)]="novoMonitor.alunos" placeholder="Ex: 15" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all placeholder:text-dashboard-muted/70">
+                      </div>
+                      <div class="flex flex-col gap-2">
                         <label class="font-poppins font-medium text-[14px] text-dashboard-secondary">Status</label>
                         <select [(ngModel)]="novoMonitor.status" class="bg-dashboard-surface border border-transparent focus:border-dashboard-accent focus:bg-white text-dashboard-secondary font-inter text-[14px] px-4 py-3 rounded-[10px] outline-none transition-all cursor-pointer appearance-none">
-                            <option [ngValue]="true">Ativo</option>
-                            <option [ngValue]="false">Inativo</option>
+                          <option [ngValue]="true">Ativo</option>
+                          <option [ngValue]="false">Inativo</option>
                         </select>
+                      </div>
                     </div>
                 </div>
 

@@ -53,7 +53,7 @@ export class Monitores implements OnInit{
           tipo: d.tipoMonitoria,
           local: d.localAtuacao,
           periodo: `${d.dataInicio} até ${d.dataFim}`,
-          alunos: 0,
+          alunos: d.alunos || 0,
           status: d.status ? 'Ativo' : 'Inativo'
         }));
 
@@ -106,6 +106,7 @@ export class Monitores implements OnInit{
       local: '',
       dataInicio: '',
       dataTermino: '',
+      alunos: '',
       status: 'Ativo'
     };
   }
@@ -137,6 +138,7 @@ export class Monitores implements OnInit{
     this.novoMonitor.disciplina = monitor.disciplinaId;
     this.novoMonitor.status = monitor.statusBool;
     this.novoMonitor.semestre = monitor.semestre;
+    this.novoMonitor.alunos = monitor.alunos;
 
     if (monitor.periodo && monitor.periodo.includes(' até ')) {
       const datas = monitor.periodo.split(' até ');
@@ -158,7 +160,8 @@ export class Monitores implements OnInit{
       dataInicio: this.novoMonitor.dataInicio,
       dataFim: this.novoMonitor.dataTermino,
       status: this.novoMonitor.status === true || this.novoMonitor.status === 'Ativo',
-      professorOrientadorMatricula: this.idProfessorLogado
+      professorOrientadorMatricula: this.idProfessorLogado,
+      alunos: Number(this.novoMonitor.alunos) || 0,
     };
 
     // Usando 'any' temporariamente para contornar a tipagem estrita no envio do DTO

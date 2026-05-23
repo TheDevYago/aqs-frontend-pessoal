@@ -74,6 +74,7 @@ export class Resultados implements OnInit {
               disciplina: m.disciplinaNome,
               semestre: m.semestre,
               dataTermino: m.dataFim,
+              alunos: m.alunos || 0,
               status: 'Pendente' // Troca o 'true' para ficar elegante na tabela
             }));
 
@@ -89,7 +90,7 @@ export class Resultados implements OnInit {
   abrirModalLancamento (item: any) {
     this.modoEdicao = false;
     this.monitorSelecionado = item;
-    this.dadosLancamentos = { alunos: '', ocorrencias: '', parecer: '', observacoes: '' };
+    this.dadosLancamentos = { alunos: item.alunos ? item.alunos.toString() : 0, ocorrencias: '', parecer: '', observacoes: '' };
     this.modalLancamentoAberto = true;
   }
 
