@@ -54,7 +54,7 @@
             <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-6">Minhas Disciplinas</h3>
             <div class="flex flex-col">
                 @if (minhasDisciplinas.length > 0) {
-                    @for (disciplina of minhasDisciplinas; track disciplina.codigo) {
+                    @for (disciplina of minhasDisciplinas; track disciplina.nome) {
                         <div class="flex justify-between items-center py-6 border-b border-dashboard-surface last:border-transparent">
                             <div>
                                 <h4 class="font-inter font-bold text-[18px] text-[#0f172a]">{{disciplina.nome}}</h4>
@@ -75,7 +75,7 @@
                         <svg class="w-12 h-12 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/></svg>
                         <p class="font-inter text-dashboard-muted">Nenhuma disciplina vinculada.</p>
                     </div>
-                }     
+                }
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@
         <h3 class="font-poppins font-bold text-[20px] text-dashboard-secondary mb-6">Atividades Pendentes</h3>
         <div class="flex flex-col">
             @if (atividades.length > 0) {
-                @for (atv of atividades; track atv.titulo) {
+                @for (atv of atividades; track atv.subtitulo) {
                     <div class="flex items-center gap-4 py-6 border-b border-dashboard-surface last:border-transparent">
                         <div class="w-3 h-3 rounded-full {{atv.corBolinha}} shrink-0"></div>
                         <div class="flex-1">

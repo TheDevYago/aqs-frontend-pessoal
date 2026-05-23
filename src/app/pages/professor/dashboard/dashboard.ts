@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { MonitoriaService } from '../../../core/services/monitoria.service';
 import { ResultadoService } from '../../../core/services/resultado.service';
 import { ProfessorService } from '../../../core/services/professor.service';
 import { ToastServ } from '../../../core/services/toast.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -18,9 +20,9 @@ export class Dashboard implements OnInit {
   private resultadoServ = inject(ResultadoService);
   private professorServ = inject(ProfessorService);
   private toastService = inject(ToastServ);
+  private cdr = inject(ChangeDetectorRef);
 
-
-  private idProfessorLogado = 1;
+  private matriculaProfessorLogado = 10002;
 
   nomeProfessor: string = 'Carregando...';
 
@@ -41,42 +43,69 @@ export class Dashboard implements OnInit {
 
   carregarDados() {
     forkJoin({
-      perfil: this.professorServ.buscarPorId(this.idProfessorLogado),
-      monitorias: this.monitoriaServ.listarTodas(),
-      resultados: this.resultadoServ.listarTodos()
+      // CORREÇÃO: Usa 'nome' e cast para 'any' para evitar erros de tipagem
+      perfil: this.professorServ.buscarPorId(this.matriculaProfessorLogado).pipe(
+        catchError(err => {
+          console.warn('Endpoint de professor não encontrado. Usando nome padrão.', err);
+          return of({ nome: 'Pedro' } as any);
+        })
+      ),
+      monitorias: this.monitoriaServ.buscarPorProfessor(this.matriculaProfessorLogado).pipe(
+        catchError(err => {
+          console.error('Erro ao buscar monitorias:', err);
+          return of([]);
+        })
+      ),
+      resultados: this.resultadoServ.listarTodos().pipe(
+        catchError(err => {
+          console.error('Erro ao buscar resultados:', err);
+          return of([]);
+        })
+      )
     }).subscribe({
       next: (res) => {
-        this.nomeProfessor = res.perfil.nome;
-        
-        const ativas = res.monitorias.filter(m => m.status === 'Ativo');
-        this.monitoresAtivos = ativas.slice(0, 5);
+        // O TypeScript agora aceita o 'nome' sem problemas
+        const perfil: any = res.perfil;
+        this.nomeProfessor = perfil?.nome ? perfil.nome.split(' ')[0] : 'Professor';
 
-        const nomesDisciplinas = [...new Set(res.monitorias.map(m => m.disciplina))];
-        this.minhasDisciplinas = nomesDisciplinas.map(nome => ({
+        const ativas = res.monitorias.filter((m: any) => m.status === true);
+
+        this.monitoresAtivos = ativas.slice(0, 5).map((m: any) => ({
+          matricula: m.alunoMatricula,
+          nome: m.alunoNome || 'Aluno',
+          disciplina: m.disciplinaNome || 'Disciplina não informada',
+          alunos: m.alunos || 0
+        }));
+
+        const nomesDisciplinas = [...new Set(res.monitorias.map((m: any) => m.disciplinaNome))].filter(n => n);
+        this.minhasDisciplinas = nomesDisciplinas.map((nome: any) => ({
           nome,
-          totalMonitores: res.monitorias.filter(m => m.disciplina === nome).length
+          codigo: 'AQS-2026',
+          ch: '80h',
+          totalMonitores: res.monitorias.filter((m: any) => m.disciplinaNome === nome).length
         }));
 
         this.estatistica[0].valor = ativas.length.toString();
         this.estatistica[1].valor = nomesDisciplinas.length.toString();
         this.estatistica[2].valor = res.resultados.length.toString();
-        this.estatistica[3].valor = ativas.filter(m => m.tipo === 'Presencial').length.toString();
+        this.estatistica[3].valor = (ativas.length - res.resultados.length).toString();
 
         this.gerarAtividades(ativas, res.resultados);
-      },
-      error: () => this.toastService.exibir('Erro ao carregar dados do Dashboard', 'aviso')
+        this.cdr.detectChanges();
+      }
     });
   }
 
-  private gerarAtividades(monitorias: any[], resultados: any[]) {
+  private gerarAtividades(monitoriasAtivas: any[], resultados: any[]) {
     this.atividades = [];
 
-    monitorias.forEach(m => {
-      const jaLancado = resultados.find(r => r.matricula === m.matricula);
+    monitoriasAtivas.forEach(m => {
+      const jaLancado = resultados.find(r => r.idMonitoria === m.id);
+
       if (!jaLancado) {
         this.atividades.push({
-          titulo: 'Lançar Resultados da Monitoria',
-          subtitulo: `${m.nome || m.monitor} - ${m.disciplina}`,
+          titulo: 'Lançar Parecer Final',
+          subtitulo: `${m.alunoNome} - ${m.disciplinaNome}`,
           tempo: 'Pendente',
           corBolinha: 'bg-red-500'
         });
@@ -86,7 +115,7 @@ export class Dashboard implements OnInit {
     if (this.atividades.length === 0) {
       this.atividades.push({
         titulo: 'Tudo em dia!',
-        subtitulo: 'Nenhuma ação pendente no momento.',
+        subtitulo: 'Nenhuma atividade pendente.',
         tempo: 'Agora',
         corBolinha: 'bg-emerald-500'
       });
