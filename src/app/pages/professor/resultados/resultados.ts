@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { ResultadoService } from '../../../core/services/resultado.service';
 import { MonitoriaService } from '../../../core/services/monitoria.service';
 import { Resultado } from '../../../core/models/resultado.model';
+
 @Component({
   selector: 'app-resultados',
   standalone: true,
@@ -16,9 +17,12 @@ export class Resultados implements OnInit {
   private toastService = inject(ToastServ);
   private resultadoServ = inject(ResultadoService);
   private monitorServ = inject(MonitoriaService);
+  private cdr = inject(ChangeDetectorRef);
 
   monitoriaPendentes: any[] = [];
   resultadosLancados: Resultado[] = [];
+
+  idProfessorLogado: number = 10002;
 
   get resumo () {
     return {
@@ -43,20 +47,43 @@ export class Resultados implements OnInit {
   }
 
   ngOnInit() {
-      this.carregarDados();
+    this.carregarDados();
   }
 
   carregarDados(){
+    // Primeiro carrega os resultados
     this.resultadoServ.listarTodos().subscribe({
-      next: (dados) => this.resultadosLancados = dados,
+      next: (resultados) => {
+        this.resultadosLancados = resultados;
+
+        // Depois carrega as monitorias APENAS do professor logado
+        this.monitorServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
+          next: (monitorias: any[]) => {
+
+            // 1. Filtra as monitorias (ativas e sem resultado)
+            const pendentesCrus = monitorias.filter(m =>
+              m.status &&
+              !this.resultadosLancados.some(r => r.idMonitoria === m.id)
+            );
+
+            // 2. O TRADUTOR: Converte os nomes do Java para os nomes que o HTML espera!
+            this.monitoriaPendentes = pendentesCrus.map(m => ({
+              id: m.id,
+              matricula: m.alunoMatricula,
+              monitor: m.alunoNome,
+              disciplina: m.disciplinaNome,
+              semestre: m.semestre,
+              dataTermino: m.dataFim,
+              status: 'Pendente' // Troca o 'true' para ficar elegante na tabela
+            }));
+
+            this.cdr.detectChanges();
+          },
+          error: () => this.toastService.exibir('Erro ao carregar pendências', 'aviso')
+        });
+      },
       error: () => this.toastService.exibir('Erro ao carregar resultados', 'aviso')
     });
-    this.monitorServ.listarTodas().subscribe({
-      next: (dados) => {
-        this.monitoriaPendentes = dados.filter(m => m.status === 'Ativo');
-      },
-      error: () => this.toastService.exibir('Erro ao carregar pendências', 'aviso')
-    })
   }
 
   abrirModalLancamento (item: any) {
@@ -87,7 +114,7 @@ export class Resultados implements OnInit {
 
   salvarResultado() {
     if(this.modoEdicao && this.itemSelecionado) {
-       const resultadoAtualizado: Resultado = {
+      const resultadoAtualizado: Resultado = {
         ...this.itemSelecionado,
         alunos: Number(this.dadosLancamentos.alunos),
         parecer: this.dadosLancamentos.parecer,
@@ -103,10 +130,11 @@ export class Resultados implements OnInit {
         error: () => this.toastService.exibir('Erro ao atualizar resultado', 'aviso')
       });
     } else {
+      // MAPEAMENTO CORRIGIDO: Lendo as variáveis traduzidas pelo carregarDados()
       const novoResultado: Resultado = {
         idMonitoria: this.monitorSelecionado.id,
         matricula: this.monitorSelecionado.matricula,
-        monitor: this.monitorSelecionado.nome || this.monitorSelecionado.monitor,
+        monitor: this.monitorSelecionado.monitor,
         disciplina: this.monitorSelecionado.disciplina,
         semestre: this.monitorSelecionado.semestre || '2026.1',
         alunos: Number(this.dadosLancamentos.alunos),
@@ -137,7 +165,7 @@ export class Resultados implements OnInit {
     this.itemSelecionado = null;
   }
 
- confirmarExclusao() {
+  confirmarExclusao() {
     if (this.itemSelecionado && this.itemSelecionado.id) {
       this.resultadoServ.excluir(this.itemSelecionado.id).subscribe({
         next: () => {
