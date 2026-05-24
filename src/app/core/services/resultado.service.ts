@@ -25,4 +25,8 @@ export class ResultadoService {
   excluir(id: number){
     return this.http.delete(`${this.API}/${id}`);
   }
+  listarPorProfessor(matricula: number) {
+    return this.http.get<Resultado[]>(`${this.API}/professor/${matricula}`);
+  }
+
 }

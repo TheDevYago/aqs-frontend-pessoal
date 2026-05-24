@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { ProfessorService } from '../../../core/services/professor.service';
 import { Formacao, Professor } from '../../../core/models/professor.model';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-perfil',
@@ -16,8 +18,11 @@ export class Perfil implements OnInit {
   private toastService = inject(ToastServ);
   private professorServ = inject(ProfessorService);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  idProfessorLogado: number = 10002
+  // 1. MUDANÇA: Variável corrigida para guardar a matrícula!
+  private matriculaProfessorLogado!: number;
 
   professor: any = {nome: '', matricula: '', email: '', telefone: '', escola: {nome: ''}};
   formData = {nomeCompleto: '', matricula: '', email: '', telefone: ''};
@@ -30,16 +35,24 @@ export class Perfil implements OnInit {
   fotoPreview: string | ArrayBuffer | null = null;
 
   ngOnInit() {
-    this.carregarDados();
+    const usuario = this.authService.getUsuarioLogado();
+
+    // 2. MUDANÇA: Lendo a matrícula do AuthService, igual fizemos na Dashboard
+    if (usuario && usuario.matriculaProfessor) {
+      this.matriculaProfessorLogado = usuario.matriculaProfessor;
+      this.carregarDados();
+    } else {
+      this.toastService.exibir('Sessão expirada.', 'aviso');
+      this.router.navigate(['/login']);
+    }
   }
 
   carregarDados() {
-    this.professorServ.buscarPorId(this.idProfessorLogado).subscribe({
+    // 3. MUDANÇA: Enviando a matrícula para o endpoint do backend
+    this.professorServ.buscarPorId(this.matriculaProfessorLogado).subscribe({
       next: (dados: any) => {
-        // Mapeia os dados do professor e a escola
         this.professor = { ...dados, escola: { nome: dados.escolaNome } };
 
-        // Traduz do DTO do Java para a Interface do HTML
         this.formacoes = (dados.formacoes || []).map((f: any) => ({
           nivel: f.titulacao,
           instituicao: f.instituicao,
@@ -62,7 +75,6 @@ export class Perfil implements OnInit {
 
   ativarEdicao() {
     this.modoEdicao = true;
-    // Garante que o formulário recarregue os dados originais caso o usuário tenha apagado algo e desistido
     this.formData = {
       nomeCompleto: this.professor.nome,
       matricula: this.professor.matricula,
@@ -75,7 +87,6 @@ export class Perfil implements OnInit {
     this.modoEdicao = false;
   }
 
-  // Helper para traduzir da Interface do HTML para o DTO do Java antes de salvar
   private getPayloadComFormacoes() {
     return {
       ...this.professor,
@@ -95,7 +106,7 @@ export class Perfil implements OnInit {
     this.professorServ.atualizar(Number(this.professor.matricula), this.getPayloadComFormacoes()).subscribe({
       next: () => {
         this.toastService.exibir('Alterações salvas com sucesso!', 'sucesso');
-        this.modoEdicao = false; // <-- Fecha os inputs e volta pro modo texto
+        this.modoEdicao = false;
         this.carregarDados();
       },
       error: () => this.toastService.exibir('Erro ao atualizar perfil', 'aviso')
@@ -122,7 +133,6 @@ export class Perfil implements OnInit {
       instituicao: this.novaFormacao.instituicao
     };
 
-    // Adiciona na tela e gera o payload traduzido pro backend
     this.formacoes = [nova, ...this.formacoes];
 
     this.professorServ.atualizar(Number(this.professor.matricula), this.getPayloadComFormacoes()).subscribe({
@@ -132,8 +142,8 @@ export class Perfil implements OnInit {
         this.carregarDados();
       },
       error: (err) => {
-        console.error("🚨 ERRO AO ADICIONAR FORMAÇÃO:", err); // <-- [IMPRIMIR O ERRO]
-        this.formacoes.shift(); // Remove a que falhou da tela
+        console.error("🚨 ERRO AO ADICIONAR FORMAÇÃO:", err);
+        this.formacoes.shift();
         this.toastService.exibir('Erro ao salvar formação', 'aviso');
       }
     });
@@ -149,7 +159,7 @@ export class Perfil implements OnInit {
       },
       error: () => {
         this.toastService.exibir('Erro ao remover formação', 'aviso');
-        this.formacoes.splice(index, 0, formacaoRemovida); // Devolve a formação pra tela se der erro
+        this.formacoes.splice(index, 0, formacaoRemovida);
       }
     });
   }
@@ -161,7 +171,7 @@ export class Perfil implements OnInit {
       reader.onload = () => { this.fotoPreview = reader.result; };
       reader.readAsDataURL(arquivo);
 
-      this.professorServ.uploadFoto(this.idProfessorLogado, arquivo).subscribe({
+      this.professorServ.uploadFoto(this.matriculaProfessorLogado, arquivo).subscribe({
         next: () => {
           this.toastService.exibir('Foto de perfil atualizada!', 'sucesso');
         },

@@ -4,8 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { MonitoriaService } from '../../../core/services/monitoria.service';
 import { Monitoria } from '../../../core/models/monitoria.model';
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-monitores',
@@ -19,8 +21,10 @@ export class Monitores implements OnInit{
   private monitoriaServ = inject(MonitoriaService);
   private cdr = inject(ChangeDetectorRef);
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  idProfessorLogado: number = 10002; // A matrícula fixa do Professor Pedro
+  private matriculaProfessorLogado!: number;
 
   tBusca: string = '';
   monitores: Monitoria[] = [];
@@ -35,12 +39,19 @@ export class Monitores implements OnInit{
   novoMonitor: any = this.resetNovoMonitor();
 
   ngOnInit() {
-    this.carregarDados();
-    this.carregarAlunos();
+    const usuario = this.authService.getUsuarioLogado();
+    if (usuario && usuario.matriculaProfessor) {
+      this.matriculaProfessorLogado = usuario.matriculaProfessor;
+      this.carregarDados();
+      this.carregarAlunos();
+    } else {
+      this.toastService.exibir('Sessão expirada.', 'aviso');
+      this.router.navigate(['/login']);
+    }
   }
 
   carregarDados() {
-    this.monitoriaServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
+    this.monitoriaServ.buscarPorProfessor(this.matriculaProfessorLogado).subscribe({
       next: (dados: any[]) => {
         this.monitores = dados.map(d => ({
           id: d.id,
@@ -160,7 +171,7 @@ export class Monitores implements OnInit{
       dataInicio: this.novoMonitor.dataInicio,
       dataFim: this.novoMonitor.dataTermino,
       status: this.novoMonitor.status === true || this.novoMonitor.status === 'Ativo',
-      professorOrientadorMatricula: this.idProfessorLogado,
+      professorOrientadorMatricula: this.matriculaProfessorLogado,
       alunos: Number(this.novoMonitor.alunos) || 0,
     };
 

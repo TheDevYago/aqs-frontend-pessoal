@@ -6,7 +6,8 @@ import { MonitoriaService } from '../../../core/services/monitoria.service';
 import { ResultadoService } from '../../../core/services/resultado.service';
 import { ProfessorService } from '../../../core/services/professor.service';
 import { ToastServ } from '../../../core/services/toast.service';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,8 +22,10 @@ export class Dashboard implements OnInit {
   private professorServ = inject(ProfessorService);
   private toastService = inject(ToastServ);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  private matriculaProfessorLogado = 10002;
+  private matriculaProfessorLogado!: number;
 
   nomeProfessor: string = 'Carregando...';
 
@@ -38,35 +41,54 @@ export class Dashboard implements OnInit {
   atividades: any[] = [];
 
   ngOnInit() {
-    this.carregarDados();
+    const usuario = this.authService.getUsuarioLogado();
+
+    if (usuario && usuario.matriculaProfessor) {
+      this.matriculaProfessorLogado = usuario.matriculaProfessor;
+
+      // A CORREÇÃO PRINCIPAL: Passamos a matrícula (ex: 10002) em vez do ID (ex: 7)
+      this.carregarDados(this.matriculaProfessorLogado);
+    } else {
+      this.toastService.exibir('Sessão expirada ou acesso negado. Faça login novamente.', 'aviso');
+      this.authService.logout();
+      this.router.navigate(['/login']);
+    }
   }
 
-  carregarDados() {
+  carregarDados(matricula: number) {
     forkJoin({
-      // CORREÇÃO: Usa 'nome' e cast para 'any' para evitar erros de tipagem
-      perfil: this.professorServ.buscarPorId(this.matriculaProfessorLogado).pipe(
+      perfil: this.professorServ.buscarPorId(matricula).pipe(
         catchError(err => {
-          console.warn('Endpoint de professor não encontrado. Usando nome padrão.', err);
-          return of({ nome: 'Pedro' } as any);
+          // Em vez de esconder o erro, vamos mandar o código do erro para a tela!
+          return of({ nome: `[Erro Backend: ${err.status}]` } as any);
         })
       ),
-      monitorias: this.monitoriaServ.buscarPorProfessor(this.matriculaProfessorLogado).pipe(
+      monitorias: this.monitoriaServ.buscarPorProfessor(matricula).pipe(
         catchError(err => {
-          console.error('Erro ao buscar monitorias:', err);
           return of([]);
         })
       ),
       resultados: this.resultadoServ.listarTodos().pipe(
         catchError(err => {
-          console.error('Erro ao buscar resultados:', err);
           return of([]);
         })
       )
     }).subscribe({
       next: (res) => {
-        // O TypeScript agora aceita o 'nome' sem problemas
         const perfil: any = res.perfil;
-        this.nomeProfessor = perfil?.nome ? perfil.nome.split(' ')[0] : 'Professor';
+        const nomeVindoDaAPI = perfil?.nome;
+
+        // O NOSSO DETETIVE VISUAL:
+        if (nomeVindoDaAPI) {
+          // Remove a palavra "Professor" ou "Prof." do início, caso a pessoa tenha digitado no cadastro
+          let nomeLimpo = nomeVindoDaAPI.replace(/^(Professor|Prof\.|Prof)\s*/i, '');
+
+          // Agora sim, pega o primeiro nome real (ex: "Pedro")
+          this.nomeProfessor = nomeLimpo.split(' ')[0];
+        } else {
+          // Fallback caso venha vazio
+          this.nomeProfessor = 'Professor';
+        }
 
         const ativas = res.monitorias.filter((m: any) => m.status === true);
 

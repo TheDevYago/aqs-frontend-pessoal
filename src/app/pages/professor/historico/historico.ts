@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ToastServ } from '../../../core/services/toast.service';
 import { ResultadoService } from '../../../core/services/resultado.service';
 import {MonitoriaService} from '../../../core/services/monitoria.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-historico',
@@ -17,8 +19,10 @@ export class Historico implements OnInit {
   private resultadoServ = inject(ResultadoService);
   private monitorServ = inject(MonitoriaService);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  idProfessorLogado: number = 10002;
+  private matriculaProfessorLogado!: number;
 
   resumo = {
     totalMonitorias: 0,
@@ -32,15 +36,22 @@ export class Historico implements OnInit {
   historicoFiltrado: any[] = [];
 
   ngOnInit() {
-    this.carregarDados();
+    const usuario = this.authService.getUsuarioLogado();
+    if (usuario && usuario.matriculaProfessor) {
+      this.matriculaProfessorLogado = usuario.matriculaProfessor;
+      this.carregarDados();
+    } else {
+      this.toastService.exibir('Sessão expirada.', 'aviso');
+      this.router.navigate(['/login']);
+    }
   }
 
   carregarDados(){
     // 1. Busca primeiro os resultados
-    this.resultadoServ.listarTodos().subscribe({
+    this.resultadoServ.listarPorProfessor(this.matriculaProfessorLogado).subscribe({
       next: (resultados) => {
-        // 2. Busca todas as monitorias do professor
-        this.monitorServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
+        // 2. Busca pelas monitorias do professor logado
+        this.monitorServ.buscarPorProfessor(this.matriculaProfessorLogado).subscribe({
           next: (monitorias: any[]) => {
 
             // 3. A MÁGICA: Cruza os dados das duas tabelas

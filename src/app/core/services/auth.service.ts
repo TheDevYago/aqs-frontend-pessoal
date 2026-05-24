@@ -17,8 +17,9 @@ export class AuthService {
         if (response && response.token) {
           localStorage.setItem('token', response.token);
 
-          if (response.usuarioDTO) {
-            localStorage.setItem('usuario', JSON.stringify(response.usuarioDTO));
+          // Ajustado de usuarioDTO para usuario
+          if (response.usuario) {
+            localStorage.setItem('usuario', JSON.stringify(response.usuario));
           }
         }
       })
@@ -29,4 +30,16 @@ export class AuthService {
     localStorage.clear();
   }
 
+  getUsuarioLogado(): any {
+    const userJson = localStorage.getItem('usuario');
+    return userJson ? JSON.parse(userJson) : null;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  isLogado(): boolean {
+    return !!this.getToken();
+  }
 }

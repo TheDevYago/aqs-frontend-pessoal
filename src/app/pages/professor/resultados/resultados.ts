@@ -5,6 +5,8 @@ import { ToastServ } from '../../../core/services/toast.service';
 import { ResultadoService } from '../../../core/services/resultado.service';
 import { MonitoriaService } from '../../../core/services/monitoria.service';
 import { Resultado } from '../../../core/models/resultado.model';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-resultados',
@@ -18,11 +20,13 @@ export class Resultados implements OnInit {
   private resultadoServ = inject(ResultadoService);
   private monitorServ = inject(MonitoriaService);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   monitoriaPendentes: any[] = [];
   resultadosLancados: Resultado[] = [];
 
-  idProfessorLogado: number = 10002;
+  private matriculaProfessorLogado!: number;
 
   get resumo () {
     return {
@@ -47,17 +51,24 @@ export class Resultados implements OnInit {
   }
 
   ngOnInit() {
-    this.carregarDados();
+    const usuario = this.authService.getUsuarioLogado();
+    if (usuario && usuario.matriculaProfessor) {
+      this.matriculaProfessorLogado = usuario.matriculaProfessor;
+      this.carregarDados();
+    } else {
+      this.toastService.exibir('Sessão expirada.', 'aviso');
+      this.router.navigate(['/login']);
+    }
   }
 
   carregarDados(){
     // Primeiro carrega os resultados
-    this.resultadoServ.listarTodos().subscribe({
+    this.resultadoServ.listarPorProfessor(this.matriculaProfessorLogado).subscribe({
       next: (resultados) => {
         this.resultadosLancados = resultados;
 
-        // Depois carrega as monitorias APENAS do professor logado
-        this.monitorServ.buscarPorProfessor(this.idProfessorLogado).subscribe({
+        // Usa a matrícula dinâmica
+        this.monitorServ.buscarPorProfessor(this.matriculaProfessorLogado).subscribe({
           next: (monitorias: any[]) => {
 
             // 1. Filtra as monitorias (ativas e sem resultado)
