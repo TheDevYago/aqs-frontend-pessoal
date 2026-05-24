@@ -10,6 +10,7 @@ import { Matrizes } from './pages/admin/matrizes/matrizes';
 import { Disciplinas } from './pages/admin/disciplinas/disciplinas';
 import { Relatorios } from './pages/admin/relatorios/relatorios';
 import { Fechamento } from './pages/admin/fechamento/fechamento';
+import { authGuard } from './core/guards/auth.guard';
 
 // rotas de professor
 import { Layout as layoutProfessor } from './pages/professor/layout/layout';
@@ -23,9 +24,10 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: '', redirectTo: 'login', pathMatch: 'full' },
 
-    {path: 'admin', component: Layout, children: [
+    {path: 'admin', component: Layout, canActivate: [authGuard], data: {roleEsperada: 'ADMIN'}, children: [
             {path:'', redirectTo: 'dashboard', pathMatch: 'full'},
             {path: 'dashboard', component: Dashboard},
+
             {path: 'ies', component: IesC},
             {path: 'escolas', component: Escolas},
             {path: 'professores', component: Professores},
@@ -37,9 +39,10 @@ export const routes: Routes = [
         ]
     },
 
-    {path: 'professor', component:layoutProfessor, children: [
+    {path: 'professor', component:layoutProfessor, canActivate: [authGuard], data:{roleEsperada: 'USER'}, children: [
         {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
         {path: 'dashboard', component: dashboardProfessor},
+
         {path: 'perfil', component: Perfil},
         {path: 'monitores', component: Monitores},
         {path: 'resultados', component: Resultados},

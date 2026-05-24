@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import {Router, RouterModule, RouterOutlet} from '@angular/router';
+import {AuthService} from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -9,6 +10,13 @@ import { RouterModule, RouterOutlet } from '@angular/router';
   templateUrl: './layout.html',
   styleUrl: './layout.css',
 })
-export class Layout {
 
+export class Layout {
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  fazerLogout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

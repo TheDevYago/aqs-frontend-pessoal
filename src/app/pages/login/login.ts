@@ -48,21 +48,34 @@ export class Login {
 
     this.authServ.login(credenciais).subscribe({
       next: (res) => {
-        // 1. DESTRAVA O BOTÃO NO INÍCIO DO SUCESSO
         this.carregando = false;
+
+        // Pega o usuário REAIS que o Java acabou de devolver e salvar no localStorage
+        const usuarioReal = this.authServ.getUsuarioLogado();
+
+        // Faz uma validação extra: O botão que ele clicou bate com a realidade?
+        if (this.perfilSelecionado === 'Administrador' && usuarioReal?.role !== 'ADMIN') {
+          this.toastService.exibir('Credenciais inválidas para Administrador', 'erro');
+          this.authServ.logout(); // Expulsa
+          return;
+        }
+        if (this.perfilSelecionado === 'Professor' && usuarioReal?.role !== 'USER') {
+          this.toastService.exibir('Credenciais inválidas para Professor', 'erro');
+          this.authServ.logout(); // Expulsa
+          return;
+        }
+
         this.toastService.exibir('Login realizado com sucesso!', 'sucesso');
 
-        // 2. NAVEGAÇÃO SEGURA (Usando navigateByUrl para evitar erros de segmento)
-        const rota = this.perfilSelecionado === 'Administrador' ? '/admin/dashboard' : '/professor/dashboard';
-      
+        // A ROTA AGORA É DECIDIDA PELO BANCO DE DADOS, NÃO PELO BOTÃO!
+        const rota = usuarioReal?.role === 'ADMIN' ? '/admin/dashboard' : '/professor/dashboard';
+
         this.router.navigateByUrl(rota).catch(err => {
           console.error('Erro de rota:', err);
-        // Se a rota falhar, o console vai dizer exatamente o porquê
         });
       },
       error: (err) => {
-        // 3. DESTRAVA O BOTÃO SE O LOGIN FALHAR
-        this.carregando = false; 
+        this.carregando = false;
         console.error('Erro no login:', err);
         this.toastService.exibir('Usuário ou senha inválidos', 'erro');
       }
